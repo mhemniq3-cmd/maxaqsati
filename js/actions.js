@@ -21,16 +21,11 @@ function triggerCopyGlowEffect() {
     }
 }
 
-window.handleCopyTemplate = function(e) {
+window.handleCopyTemplate = function() {
     const box = document.getElementById('templatePreviewBox');
     if (!box || !box.value) return;
 
     if (window.SoundEngine) window.SoundEngine.playSuccessChime();
-
-    // Option 2: Trigger Emerald Sparkle Burst
-    if (window.createEmeraldSparkleBurst && e) {
-        window.createEmeraldSparkleBurst(e.clientX, e.clientY);
-    }
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(box.value).then(() => {
@@ -50,16 +45,11 @@ window.handleCopyTemplate = function(e) {
     }
 };
 
-window.handleCopySinglePlan = function(e) {
+window.handleCopySinglePlan = function() {
     const s = window.AppState;
     let singleText = '';
 
     if (window.SoundEngine) window.SoundEngine.playSuccessChime();
-
-    // Option 2: Trigger Emerald Sparkle Burst
-    if (window.createEmeraldSparkleBurst && e) {
-        window.createEmeraldSparkleBurst(e.clientX, e.clientY);
-    }
 
     if (s.currentSystem === 'platform' || s.currentSystem === 'manual') {
         const rate = (s.rates[s.currentSystem] && s.rates[s.currentSystem][s.selectedPlan]) ? s.rates[s.currentSystem][s.selectedPlan] : 0;
@@ -85,7 +75,7 @@ window.handleCopySinglePlan = function(e) {
         
         if (s.settings.storeName) singleText += `\n\n━━━━━━━━━━━━━━━━━━━━\n📍 متجر ${s.settings.storeName}`;
     } else {
-        window.handleCopyTemplate(e);
+        window.handleCopyTemplate();
         return;
     }
 
@@ -99,18 +89,13 @@ window.handleCopySinglePlan = function(e) {
     }
 };
 
-window.handleShareWhatsApp = function(e) {
+window.handleShareWhatsApp = function() {
     const s = window.AppState;
     const box = document.getElementById('templatePreviewBox');
     if (!box || !box.value) return;
 
     if (window.SoundEngine) window.SoundEngine.playSuccessChime();
     triggerCopyGlowEffect();
-
-    // Option 2: Trigger Emerald Sparkle Burst
-    if (window.createEmeraldSparkleBurst && e) {
-        window.createEmeraldSparkleBurst(e.clientX, e.clientY);
-    }
 
     let text = encodeURIComponent(box.value);
     let url = `https://wa.me/?text=${text}`;
@@ -412,28 +397,6 @@ function bootApplication() {
             setTimeout(() => {
                 window.updateTabIndicator(window.AppState.currentSystem);
             }, 50);
-        }
-
-        // Initialize Global Cloud Sync Engine
-        if (window.CloudSync && typeof window.CloudSync.init === 'function') {
-            window.CloudSync.init();
-        }
-
-        // Bind Cloud Sync Buttons in Settings
-        const btnDownloadConfig = document.getElementById('btnDownloadConfig');
-        const btnCloudSyncNow = document.getElementById('btnCloudSyncNow');
-        if (btnDownloadConfig) {
-            btnDownloadConfig.addEventListener('click', () => {
-                if (window.CloudSync) window.CloudSync.downloadUpdatedConfig();
-            });
-        }
-        if (btnCloudSyncNow) {
-            btnCloudSyncNow.addEventListener('click', async () => {
-                if (window.CloudSync) {
-                    await window.CloudSync.pullLatestConfig();
-                    window.showToast('☁️ تم تحديث البيانات من السحابة المركزية بنجاح');
-                }
-            });
         }
     } catch(err) {
         console.error('Initialization error:', err);

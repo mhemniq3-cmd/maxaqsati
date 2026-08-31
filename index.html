@@ -6,10 +6,10 @@
     <title>ماكس للتقسيط</title>
     
     <!-- PWA & Mobile Meta Tags with Luxury Favicon & App Icons -->
-    <link rel="manifest" href="manifest.json?v=33">
-    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=33">
-    <link rel="icon" type="image/png" sizes="64x64" href="favicon.png?v=33">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=33">
+    <link rel="manifest" href="manifest.json?v=35">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=35">
+    <link rel="icon" type="image/png" sizes="64x64" href="favicon.png?v=35">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=35">
     <meta name="theme-color" content="#f1f4f9">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -37,12 +37,24 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <!-- Custom Fintech Luxury Styles -->
-    <link rel="stylesheet" href="styles.css?v=33">
+    <link rel="stylesheet" href="styles.css?v=36">
 </head>
 <body class="flex items-center justify-center p-3 sm:p-6 lg:p-10 selection:bg-emerald-500 selection:text-white transition-colors duration-300">
 
     <!-- Main Executive Fintech Canvas (Design A) -->
     <div class="max-w-4xl w-full mx-auto executive-frame rounded-[28px] p-5 sm:p-8 space-y-6 shadow-2xl relative">
+
+        <!-- Futuristic Entrance Border Laser Scan Overlay (Option 2) -->
+        <svg class="laser-beam-svg" id="laserBorderSvg" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="laserBeamGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#34d399" stop-opacity="0"></stop>
+                    <stop offset="60%" stop-color="#10b981" stop-opacity="0.95"></stop>
+                    <stop offset="100%" stop-color="#a7f3d0" stop-opacity="1"></stop>
+                </linearGradient>
+            </defs>
+            <rect id="laserBeamRect" class="laser-beam-rect" x="1" y="1" rx="27" ry="27" width="calc(100% - 2px)" height="calc(100% - 2px)" stroke="url(#laserBeamGradient)"></rect>
+        </svg>
 
         <!-- Executive Navbar with Unified Control Island -->
         <header class="flex flex-col sm:flex-row items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800/80 no-print">
@@ -50,7 +62,7 @@
             <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
                 <div class="flex items-center gap-3">
                     <!-- Official Max Logo Image (Interactive Ripple Trigger) -->
-                    <img id="brandLogoImg" src="favicon.png?v=33" alt="ماكس للتقسيط" 
+                    <img id="brandLogoImg" src="favicon.png?v=36" alt="ماكس للتقسيط" 
                          class="w-11 h-11 rounded-xl object-contain shadow-md bg-white p-0.5 border border-emerald-500/40 cursor-pointer logo-intro-pulse transition-transform hover:scale-105 active:scale-95"
                          title="انقر لتشغيل وميض الشعار 💎">
                     <div>
@@ -283,9 +295,12 @@
 
         <!-- 4. Luxury Executive Footer with Credits -->
         <footer class="pt-4 pb-1 border-t border-slate-200 dark:border-slate-800/80 text-center no-print flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
-            <div class="flex items-center gap-2 font-mono">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>النظام المالي المتقدم للتقسيط • 2026</span>
+            <!-- Ultra-Professional 2026 Badge -->
+            <div class="flex items-center gap-2">
+                <span class="px-3.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm inline-flex items-center gap-1.5 font-mono font-black text-xs text-emerald-500 tracking-wider">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>© 2026</span>
+                </span>
             </div>
             
             <!-- Developer Copyright Badge -->
@@ -305,7 +320,7 @@
         <!-- Kiosk Header -->
         <div class="flex items-center justify-between gap-4 pb-6 border-b border-slate-800/80">
             <div class="flex items-center gap-3.5">
-                <img src="icon-192.png?v=33" alt="ماكس للتقسيط" class="w-12 h-12 rounded-2xl object-contain shadow-lg bg-white p-1 border border-emerald-500/40">
+                <img src="icon-192.png?v=34" alt="ماكس للتقسيط" class="w-12 h-12 rounded-2xl object-contain shadow-lg bg-white p-1 border border-emerald-500/40">
                 <div>
                     <h2 id="kioskStoreName" class="font-black text-2xl text-white font-heading">
                         مكتب ماكس للتقسيط
@@ -418,6 +433,37 @@
                 <button type="button" id="closeSettingsBtn" class="text-slate-400 hover:text-white p-1">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
+            </div>
+
+            <!-- Global Cloud Sync Live Control Bar (المزامنة السحابية المركزية) -->
+            <div class="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/30 to-sky-950/30 border border-emerald-500/30 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+                        <i data-lucide="cloud" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-black text-slate-200 block text-xs sm:text-sm font-heading">المزامنة السحابية المركزية</span>
+                            <div id="cloudSyncStatusBadge" class="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-500/15 text-[11px]">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span class="text-emerald-400 font-bold">السحابة متصلة 🟢</span>
+                            </div>
+                        </div>
+                        <span class="text-[11px] text-slate-400">تحديث وتعميم النسب فورياً على جميع أجهزة وهواتف الزبائن والموظفين</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <button type="button" id="btnCloudSyncNow" class="flex-1 sm:flex-none px-3 py-2 rounded-xl fintech-card hover:border-emerald-500/50 text-emerald-400 hover:text-white text-xs font-bold transition flex items-center justify-center gap-1.5 active:scale-95 shadow-sm cursor-pointer"
+                            title="تحديث البيانات من السحابة الآن">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                        <span>مزامنة الآن 🔄</span>
+                    </button>
+                    <button type="button" id="btnDownloadConfig" class="flex-1 sm:flex-none px-3 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/40 text-emerald-300 hover:text-white text-xs font-bold transition flex items-center justify-center gap-1.5 active:scale-95 shadow-sm cursor-pointer"
+                            title="تصدير ملف config.json لتعميمه على السحابة و GitHub">
+                        <i data-lucide="download-cloud" class="w-3.5 h-3.5"></i>
+                        <span>تصدير السحابة ☁️</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Three Columns for System Rates (Platform, Manual, Other Services) -->
@@ -635,16 +681,17 @@
         <span id="toastMessage" class="text-xs font-bold">تم حفظ التغييرات</span>
     </div>
 
-    <!-- Standard Reliable Synchronous Scripts -->
-    <script src="security.js?v=33"></script>
-    <script src="audio.js?v=33"></script>
-    <script src="data.js?v=33"></script>
-    <script src="calculations.js?v=33"></script>
-    <script src="state.js?v=33"></script>
-    <script src="kiosk.js?v=33"></script>
-    <script src="render.js?v=33"></script>
-    <script src="events.js?v=33"></script>
-    <script src="actions.js?v=33"></script>
-    <script src="pwa.js?v=33"></script>
+    <!-- Standard Reliable Synchronous Scripts with Cloud Sync Engine -->
+    <script src="security.js?v=36"></script>
+    <script src="audio.js?v=36"></script>
+    <script src="data.js?v=36"></script>
+    <script src="cloud.js?v=36"></script>
+    <script src="calculations.js?v=36"></script>
+    <script src="state.js?v=36"></script>
+    <script src="kiosk.js?v=36"></script>
+    <script src="render.js?v=36"></script>
+    <script src="events.js?v=36"></script>
+    <script src="actions.js?v=36"></script>
+    <script src="pwa.js?v=36"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-let renderRafId = null;
+﻿let renderRafId = null;
 
 function requestFastRender() {
     if (renderRafId) cancelAnimationFrame(renderRafId);
@@ -60,17 +60,6 @@ window.updateTabIndicator = function(system) {
 };
 
 /**
- * Option 2: Entrance Border Laser Scan Controller
- */
-window.triggerBorderLaserScan = function() {
-    const rect = document.getElementById('laserBeamRect');
-    if (!rect) return;
-    rect.classList.remove('laser-beam-rect');
-    void rect.offsetWidth; // Force reflow
-    rect.classList.add('laser-beam-rect');
-};
-
-/**
  * Option 4: Logo Pulse & Expanding Luminous Ripple Wave Controller
  */
 window.triggerLogoRipple = function() {
@@ -82,10 +71,6 @@ window.triggerLogoRipple = function() {
         logo.classList.remove('logo-intro-pulse');
         void logo.offsetWidth;
         logo.classList.add('logo-intro-pulse');
-    }
-
-    if (typeof window.triggerBorderLaserScan === 'function') {
-        window.triggerBorderLaserScan();
     }
 
     const oldRing = frame.querySelector('.logo-ripple-ring');
@@ -135,56 +120,9 @@ window.attach3DTiltEffect = function() {
     });
 };
 
-/**
- * Option 2: Emerald Micro-Sparkle Particle Burst Generator
- */
-window.createEmeraldSparkleBurst = function(x, y) {
-    if (typeof x !== 'number' || typeof y !== 'number') {
-        x = window.innerWidth / 2;
-        y = window.innerHeight / 2;
-    }
-    const colors = ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#fbbf24', '#ffffff'];
-    const count = 16;
-
-    for (let i = 0; i < count; i++) {
-        const p = document.createElement('div');
-        p.className = 'sparkle-particle';
-
-        const size = Math.floor(Math.random() * 6) + 4; // 4px - 9px
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        const angle = (Math.PI * 2 / count) * i + (Math.random() * 0.4 - 0.2);
-        const distance = Math.floor(Math.random() * 55) + 35; // 35px - 90px
-        const dx = Math.cos(angle) * distance;
-        const dy = Math.sin(angle) * distance;
-
-        p.style.width = `${size}px`;
-        p.style.height = `${size}px`;
-        p.style.backgroundColor = color;
-        p.style.boxShadow = `0 0 10px ${color}`;
-        p.style.left = `${x - size / 2}px`;
-        p.style.top = `${y - size / 2}px`;
-        p.style.setProperty('--dx', `${dx.toFixed(1)}px`);
-        p.style.setProperty('--dy', `${dy.toFixed(1)}px`);
-
-        document.body.appendChild(p);
-        setTimeout(() => {
-            if (p && p.parentNode) p.parentNode.removeChild(p);
-        }, 500);
-    }
-};
-
 window.selectPlan = function(months) {
     if (window.SoundEngine) window.SoundEngine.playTick();
     window.AppState.selectedPlan = months;
-
-    // Option 3: Trigger Metallic Glass Sheen Sweep on the selected card
-    const cardEl = document.getElementById(`card-plan-${months}`);
-    if (cardEl) {
-        cardEl.classList.remove('sheen-active');
-        void cardEl.offsetWidth;
-        cardEl.classList.add('sheen-active');
-    }
-
     requestFastRender();
 };
 

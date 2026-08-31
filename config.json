@@ -1,0 +1,35 @@
+﻿{
+  "rates": {
+    "platform": {
+      "10": 10.0,
+      "12": 12.0,
+      "14": 14.5,
+      "16": 17.0,
+      "18": 19.5
+    },
+    "manual": {
+      "10": 12.5,
+      "12": 15.0,
+      "14": 18.0,
+      "16": 21.0,
+      "18": 24.0
+    },
+    "other": {
+      "rafidain_rate": 8.0,
+      "ahli_rasheed_monthly": 2.0,
+      "salary_customer_fee": 2000,
+      "salary_merchant_fee": 1.0
+    }
+  },
+  "settings": {
+    "storeName": "مكتب ماكس للتقسيط",
+    "storePhone": "",
+    "storeAddress": "",
+    "currency": "IQD",
+    "currencySymbol": "د.ع",
+    "calculationMode": "flat",
+    "roundingMode": "none"
+  },
+  "version": 1,
+  "updatedAt": "2026-08-31T21:25:00Z"
+}
