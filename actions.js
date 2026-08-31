@@ -341,13 +341,18 @@ window.saveSettingsFromModal = function() {
     window.InstallmentData.Storage.saveRates(s.rates);
     window.InstallmentData.Storage.saveSettings(s.settings);
 
+    // Push live updates directly to Google Firebase Cloud Database
+    if (window.CloudSync && typeof window.CloudSync.pushConfigToCloud === 'function') {
+        window.CloudSync.pushConfigToCloud();
+    }
+
     const storeDisplay = document.getElementById('storeNameDisplay');
     if (storeDisplay) storeDisplay.textContent = s.settings.storeName;
 
     if (window.SoundEngine) window.SoundEngine.playSuccessChime();
     window.closeSettingsModal();
     window.render();
-    window.showToast('✅ تم حفظ كافة النسب والإعدادات بنجاح');
+    window.showToast('☁️ تم حفظ ومزامنة النسب على سحابة Google لجميع الأجهزة!');
 };
 
 window.resetRatesToDefault = function() {

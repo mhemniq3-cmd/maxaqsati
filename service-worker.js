@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'installment-iqd-pwa-v13';
+﻿const CACHE_NAME = 'installment-iqd-pwa-v36';
 
 self.addEventListener('install', (event) => {
     self.skipWaiting();
@@ -16,7 +16,7 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
-    // Direct network fetching to avoid stale caching during development
+    // Network-first strategy with cache fallback
     event.respondWith(
         fetch(event.request).catch(() => caches.match(event.request))
     );

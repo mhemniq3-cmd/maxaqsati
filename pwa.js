@@ -1,15 +1,17 @@
 ﻿/**
- * PWA (Progressive Web App) & Offline Management
+ * PWA (Progressive Web App) & Cache Management
  */
 
 let deferredInstallPrompt = null;
 
-// Register Service Worker
+// Register Service Worker with active cache-busting
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js')
+        navigator.serviceWorker.register('./service-worker.js?v=36')
             .then((registration) => {
-                console.log('[PWA] Service Worker registered successfully:', registration.scope);
+                console.log('[PWA] Service Worker registered:', registration.scope);
+                // Force check for updates on every page load
+                registration.update().catch(() => {});
             })
             .catch((error) => {
                 console.warn('[PWA] Service Worker registration failed:', error);
@@ -19,11 +21,9 @@ if ('serviceWorker' in navigator) {
 
 // Handle Install Prompt Event
 window.addEventListener('beforeinstallprompt', (e) => {
-    // Prevent standard mini-infobar
     e.preventDefault();
     deferredInstallPrompt = e;
 
-    // Show Install Button if available
     const installBtn = document.getElementById('installPwaBtn');
     if (installBtn) {
         installBtn.classList.remove('hidden');
@@ -32,11 +32,8 @@ window.addEventListener('beforeinstallprompt', (e) => {
                 deferredInstallPrompt.prompt();
                 deferredInstallPrompt.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
-                        console.log('[PWA] User accepted the install prompt');
                         window.showToast('✅ تم تثبيت التطبيق بنجاح!');
                         installBtn.classList.add('hidden');
-                    } else {
-                        console.log('[PWA] User dismissed the install prompt');
                     }
                     deferredInstallPrompt = null;
                 });
@@ -47,21 +44,16 @@ window.addEventListener('beforeinstallprompt', (e) => {
 
 // App Installed Event
 window.addEventListener('appinstalled', () => {
-    console.log('[PWA] Application installed successfully');
     const installBtn = document.getElementById('installPwaBtn');
     if (installBtn) installBtn.classList.add('hidden');
-    window.showToast('🎉 تم تثبيت التطبيق على جهازك ويعمل الآن كبرنامج مستقل بدون إنترنت!');
+    window.showToast('🎉 تم تثبيت التطبيق على جهازك بنجاح!');
 });
 
 // Online / Offline Status Detection
 window.addEventListener('online', () => {
-    const offlineBadge = document.getElementById('offlineIndicator');
-    if (offlineBadge) offlineBadge.classList.add('hidden');
     window.showToast('📶 متصل بالإنترنت');
 });
 
 window.addEventListener('offline', () => {
-    const offlineBadge = document.getElementById('offlineIndicator');
-    if (offlineBadge) offlineBadge.classList.remove('hidden');
     window.showToast('📴 يعمل التطبيق الآن في وضع عدم الاتصال (بدون إنترنت)');
 });
