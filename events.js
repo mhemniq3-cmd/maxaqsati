@@ -13,6 +13,81 @@ function requestFastRender() {
 }
 
 /**
+ * Option 3: Liquid Sliding Magnetic Tab Indicator Engine
+ */
+window.updateTabIndicator = function(system) {
+    const container = document.getElementById('tabSwitcherContainer');
+    const pill = document.getElementById('tabPillIndicator');
+    if (!container || !pill) return;
+
+    let activeBtn = document.getElementById('tabPlatform');
+    let activeBg = 'bg-emerald-600';
+    let shadowGlow = 'shadow-emerald-500/30';
+
+    if (system === 'manual') {
+        activeBtn = document.getElementById('tabManual');
+        activeBg = 'bg-orange-600';
+        shadowGlow = 'shadow-orange-500/30';
+    } else if (system === 'other') {
+        activeBtn = document.getElementById('tabOther');
+        activeBg = 'bg-sky-600';
+        shadowGlow = 'shadow-sky-500/30';
+    }
+
+    if (!activeBtn) return;
+
+    // Calculate relative offset and width
+    const leftPos = activeBtn.offsetLeft;
+    const btnWidth = activeBtn.offsetWidth;
+
+    pill.style.left = `${leftPos}px`;
+    pill.style.width = `${btnWidth}px`;
+    pill.className = `absolute top-1.5 bottom-1.5 rounded-full shadow-lg transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none ${activeBg} ${shadowGlow}`;
+
+    // Update text states
+    ['tabPlatform', 'tabManual', 'tabOther'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            if (btn === activeBtn) {
+                btn.classList.add('text-white');
+                btn.classList.remove('text-slate-500', 'dark:text-slate-400');
+            } else {
+                btn.classList.remove('text-white');
+                btn.classList.add('text-slate-500', 'dark:text-slate-400');
+            }
+        }
+    });
+};
+
+/**
+ * Option 4: Logo Pulse & Expanding Luminous Ripple Wave Controller
+ */
+window.triggerLogoRipple = function() {
+    const frame = document.querySelector('.executive-frame');
+    const logo = document.getElementById('brandLogoImg');
+    if (!frame) return;
+
+    if (logo) {
+        logo.classList.remove('logo-intro-pulse');
+        void logo.offsetWidth;
+        logo.classList.add('logo-intro-pulse');
+    }
+
+    const oldRing = frame.querySelector('.logo-ripple-ring');
+    if (oldRing) oldRing.remove();
+
+    const ring = document.createElement('div');
+    ring.className = 'logo-ripple-ring';
+    frame.appendChild(ring);
+
+    setTimeout(() => {
+        if (ring && ring.parentNode) {
+            ring.parentNode.removeChild(ring);
+        }
+    }, 850);
+};
+
+/**
  * 3D Interactive Tilt & Holographic Specular Glow Engine
  */
 window.attach3DTiltEffect = function() {
@@ -54,25 +129,9 @@ window.selectPlan = function(months) {
 window.switchTab = function(system) {
     if (window.SoundEngine) window.SoundEngine.playTabSwitch();
     const s = window.AppState;
-    const els = window.AppElements;
     s.currentSystem = system;
 
-    const tabs = [
-        { el: els.tabPlatform, key: 'platform', activeBg: 'bg-emerald-600' },
-        { el: els.tabManual, key: 'manual', activeBg: 'bg-orange-600' },
-        { el: els.tabOther, key: 'other', activeBg: 'bg-sky-600' }
-    ];
-
-    tabs.forEach(t => {
-        if (!t.el) return;
-        t.el.classList.remove('bg-emerald-600', 'bg-orange-600', 'bg-sky-600', 'text-white', 'shadow-md');
-        t.el.classList.add('text-slate-500', 'dark:text-slate-400');
-        if (t.key === system) {
-            t.el.classList.add(t.activeBg, 'text-white', 'shadow-md');
-            t.el.classList.remove('text-slate-500', 'dark:text-slate-400');
-        }
-    });
-
+    window.updateTabIndicator(system);
     requestFastRender();
 };
 
@@ -129,6 +188,15 @@ window.clearAllFields = function() {
 window.setupEventListeners = function() {
     const s = window.AppState;
     const els = window.AppElements;
+
+    // Interactive Brand Logo Click Ripple
+    const logoImg = document.getElementById('brandLogoImg');
+    if (logoImg) {
+        logoImg.addEventListener('click', () => {
+            if (window.SoundEngine) window.SoundEngine.playTick();
+            if (window.triggerLogoRipple) window.triggerLogoRipple();
+        });
+    }
 
     // Sound toggle button in header
     const soundBtn = document.getElementById('soundToggleBtn');
@@ -206,6 +274,11 @@ window.setupEventListeners = function() {
     if (els.tabPlatform) els.tabPlatform.addEventListener('click', () => window.switchTab('platform'));
     if (els.tabManual) els.tabManual.addEventListener('click', () => window.switchTab('manual'));
     if (els.tabOther) els.tabOther.addEventListener('click', () => window.switchTab('other'));
+
+    // Resize listener to realign indicator perfectly
+    window.addEventListener('resize', () => {
+        window.updateTabIndicator(window.AppState.currentSystem);
+    });
 
     if (els.themeToggleBtn) {
         els.themeToggleBtn.addEventListener('click', () => {

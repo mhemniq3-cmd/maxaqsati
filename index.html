@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>حاسبة نسبة اقساط مكتب ماكس</title>
+    <title>ماكس للتقسيط</title>
     
     <!-- PWA & Mobile Meta Tags with Luxury Favicon & App Icons -->
-    <link rel="manifest" href="manifest.json?v=25">
-    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=25">
-    <link rel="icon" type="image/png" sizes="64x64" href="favicon.png?v=25">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=25">
+    <link rel="manifest" href="manifest.json?v=33">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=33">
+    <link rel="icon" type="image/png" sizes="64x64" href="favicon.png?v=33">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=33">
     <meta name="theme-color" content="#f1f4f9">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="مكتب ماكس">
+    <meta name="apple-mobile-web-app-title" content="ماكس للتقسيط">
     <meta name="mobile-web-app-capable" content="yes">
     
     <!-- Tailwind CSS CDN -->
@@ -37,10 +37,10 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <!-- Custom Fintech Luxury Styles -->
-    <link rel="stylesheet" href="styles.css?v=25">
+    <link rel="stylesheet" href="styles.css?v=33">
 </head>
 <body class="flex items-center justify-center p-3 sm:p-6 lg:p-10 selection:bg-emerald-500 selection:text-white transition-colors duration-300">
-    
+
     <!-- Main Executive Fintech Canvas (Design A) -->
     <div class="max-w-4xl w-full mx-auto executive-frame rounded-[28px] p-5 sm:p-8 space-y-6 shadow-2xl relative">
 
@@ -49,11 +49,10 @@
             <!-- Brand Logo & Title -->
             <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-500 p-0.5 shadow-md flex items-center justify-center">
-                        <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                            <i data-lucide="calculator" class="w-5 h-5 text-emerald-400"></i>
-                        </div>
-                    </div>
+                    <!-- Official Max Logo Image (Interactive Ripple Trigger) -->
+                    <img id="brandLogoImg" src="favicon.png?v=33" alt="ماكس للتقسيط" 
+                         class="w-11 h-11 rounded-xl object-contain shadow-md bg-white p-0.5 border border-emerald-500/40 cursor-pointer logo-intro-pulse transition-transform hover:scale-105 active:scale-95"
+                         title="انقر لتشغيل وميض الشعار 💎">
                     <div>
                         <div class="flex items-center gap-2">
                             <h1 id="storeNameDisplay" class="font-black text-lg sm:text-xl text-slate-900 dark:text-slate-100 font-heading tracking-tight">
@@ -68,14 +67,23 @@
 
             <!-- Harmonized Executive Control Island (شريط الأدوات الموحد) -->
             <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-                <!-- 1. Customer Kiosk Display Pill (Primary Highlight) -->
+                
+                <!-- PWA 1-Click Install Button (Shown on installable browsers) -->
+                <button type="button" id="installPwaBtn"
+                        class="px-3.5 py-2 rounded-xl fintech-card hover:border-emerald-500/60 text-emerald-600 dark:text-emerald-400 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer hidden"
+                        title="تثبيت التطبيق على جهازك">
+                    <i data-lucide="download-cloud" class="w-3.5 h-3.5"></i>
+                    <span>تثبيت التطبيق 📲</span>
+                </button>
+
+                <!-- Customer Kiosk Display Pill -->
                 <button type="button" id="openKioskBtn"
                         class="px-3.5 py-2 rounded-xl fintech-card hover:border-sky-500/60 text-sky-600 dark:text-sky-400 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer">
                     <i data-lucide="monitor" class="w-3.5 h-3.5"></i>
                     <span>شاشة الزبون 🖥️</span>
                 </button>
 
-                <!-- 2. Unified Quick Utility Capsule (Sound, Theme, Settings) -->
+                <!-- Unified Quick Utility Capsule (Sound, Theme, Settings) -->
                 <div class="fintech-card rounded-xl p-1 flex items-center gap-1 shadow-sm border border-slate-200 dark:border-slate-800">
                     <!-- Sound Toggle Button -->
                     <button type="button" id="soundToggleBtn"
@@ -108,31 +116,34 @@
             </div>
         </header>
 
-        <!-- Centered Segmented 3-System Switcher -->
-        <div class="no-print flex justify-center">
-            <div class="fintech-card rounded-full p-1.5 flex w-full max-w-md gap-1.5 shadow-inner">
+        <!-- Centered Segmented 3-System Switcher (Ripple Item 1 with Liquid Indicator) -->
+        <div class="no-print flex justify-center ripple-item-1">
+            <div id="tabSwitcherContainer" class="fintech-card rounded-full p-1.5 flex w-full max-w-md shadow-inner relative overflow-hidden">
+                <!-- Sliding Fluid Magnetic Capsule Indicator -->
+                <div id="tabPillIndicator" class="absolute top-1.5 bottom-1.5 rounded-full shadow-lg transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] pointer-events-none bg-emerald-600 shadow-emerald-500/30"></div>
+
                 <button type="button" id="tabPlatform"
-                        class="flex-1 py-2.5 px-3 rounded-full font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all bg-emerald-600 text-white shadow-md cursor-pointer">
+                        class="flex-1 py-2.5 px-3 rounded-full font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors duration-200 text-white relative z-10 cursor-pointer">
                     <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
                     <span>تقسيط المنصة</span>
                 </button>
 
                 <button type="button" id="tabManual"
-                        class="flex-1 py-2.5 px-3 rounded-full font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 cursor-pointer">
+                        class="flex-1 py-2.5 px-3 rounded-full font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors duration-200 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 relative z-10 cursor-pointer">
                     <i data-lucide="receipt" class="w-3.5 h-3.5"></i>
                     <span>التسديد اليدوي</span>
                 </button>
 
                 <button type="button" id="tabOther"
-                        class="flex-1 py-2.5 px-3 rounded-full font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 cursor-pointer">
+                        class="flex-1 py-2.5 px-3 rounded-full font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors duration-200 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 relative z-10 cursor-pointer">
                     <i data-lucide="landmark" class="w-3.5 h-3.5"></i>
                     <span>خدمات أخرى 🏛️</span>
                 </button>
             </div>
         </div>
 
-        <!-- 1. Centered Input Desk Card (تفاصيل الجهاز والسعر) -->
-        <div class="fintech-card rounded-2xl p-5 sm:p-6 space-y-4 no-print shadow-sm">
+        <!-- 1. Centered Input Desk Card (Ripple Item 2) -->
+        <div class="fintech-card rounded-2xl p-5 sm:p-6 space-y-4 no-print shadow-sm ripple-item-2">
             <div class="flex items-center justify-between pb-2.5 border-b border-slate-200 dark:border-slate-800/80">
                 <div class="flex items-center gap-2">
                     <i data-lucide="smartphone" class="w-4 h-4 text-emerald-500"></i>
@@ -215,8 +226,8 @@
             </div>
         </div>
 
-        <!-- 2. Dynamic Plan Cards Row / Banking Section (3D Tilt Container) -->
-        <div class="space-y-2.5">
+        <!-- 2. Dynamic Plan Cards Row / Banking Section (Ripple Item 3) -->
+        <div class="space-y-2.5 ripple-item-3">
             <div class="flex items-center justify-between px-1">
                 <span id="cardsSectionTitle" class="font-extrabold text-xs text-slate-800 dark:text-slate-300 font-heading">
                     عروض وخطط السداد (10 - 18 شهر):
@@ -229,8 +240,8 @@
             </div>
         </div>
 
-        <!-- 3. Customer Template & Action Buttons Card (تفاصيل الطلب) -->
-        <div class="fintech-card rounded-2xl p-5 sm:p-6 space-y-4 no-print shadow-sm">
+        <!-- 3. Customer Template & Action Buttons Card (Ripple Item 4) -->
+        <div class="fintech-card rounded-2xl p-5 sm:p-6 space-y-4 no-print shadow-sm ripple-item-4">
             <div class="flex items-center justify-between pb-2.5 border-b border-slate-200 dark:border-slate-800/80">
                 <div class="flex items-center gap-2">
                     <i data-lucide="clipboard-check" class="w-4 h-4 text-emerald-500"></i>
@@ -294,11 +305,7 @@
         <!-- Kiosk Header -->
         <div class="flex items-center justify-between gap-4 pb-6 border-b border-slate-800/80">
             <div class="flex items-center gap-3.5">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-amber-500 p-0.5 shadow-lg shadow-emerald-500/20">
-                    <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
-                        <i data-lucide="sparkles" class="w-6 h-6 text-emerald-400"></i>
-                    </div>
-                </div>
+                <img src="icon-192.png?v=33" alt="ماكس للتقسيط" class="w-12 h-12 rounded-2xl object-contain shadow-lg bg-white p-1 border border-emerald-500/40">
                 <div>
                     <h2 id="kioskStoreName" class="font-black text-2xl text-white font-heading">
                         مكتب ماكس للتقسيط
@@ -629,15 +636,15 @@
     </div>
 
     <!-- Standard Reliable Synchronous Scripts -->
-    <script src="security.js?v=25"></script>
-    <script src="audio.js?v=25"></script>
-    <script src="data.js?v=25"></script>
-    <script src="calculations.js?v=25"></script>
-    <script src="state.js?v=25"></script>
-    <script src="kiosk.js?v=25"></script>
-    <script src="render.js?v=25"></script>
-    <script src="events.js?v=25"></script>
-    <script src="actions.js?v=25"></script>
-    <script src="pwa.js?v=25"></script>
+    <script src="security.js?v=33"></script>
+    <script src="audio.js?v=33"></script>
+    <script src="data.js?v=33"></script>
+    <script src="calculations.js?v=33"></script>
+    <script src="state.js?v=33"></script>
+    <script src="kiosk.js?v=33"></script>
+    <script src="render.js?v=33"></script>
+    <script src="events.js?v=33"></script>
+    <script src="actions.js?v=33"></script>
+    <script src="pwa.js?v=33"></script>
 </body>
 </html>

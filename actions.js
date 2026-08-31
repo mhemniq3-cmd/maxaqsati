@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Action Handlers (Copy, WhatsApp, Telegram, Settings Modals & Advanced Security)
  * Enhanced with Sound FX, Visual Glow Effect, SHA-256 Password Verification & Anti-Brute Force Protection
  */
@@ -385,6 +385,18 @@ function bootApplication() {
         if (typeof window.render === 'function') window.render();
         if (window.lucide) {
             try { lucide.createIcons(); } catch(e){}
+        }
+
+        // Trigger Option 4: Logo Pulse & Ripple Wave
+        if (typeof window.triggerLogoRipple === 'function') {
+            window.triggerLogoRipple();
+        }
+
+        // Initialize Option 3: Liquid Sliding Tab Indicator
+        if (typeof window.updateTabIndicator === 'function') {
+            setTimeout(() => {
+                window.updateTabIndicator(window.AppState.currentSystem);
+            }, 50);
         }
     } catch(err) {
         console.error('Initialization error:', err);

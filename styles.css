@@ -55,6 +55,8 @@ body {
     color: var(--text-primary);
     letter-spacing: -0.01em;
     min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -68,6 +70,8 @@ body {
     border: 1px solid var(--border-subtle);
     box-shadow: var(--frame-shadow);
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
 /* Inner Fintech Cards */
@@ -201,7 +205,6 @@ body {
     }
 }
 
-
 /* Copy Flash Glow Transition */
 @keyframes copyPulseGlow {
     0% {
@@ -223,7 +226,6 @@ body {
     animation: copyPulseGlow 0.8s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-
 /* Rolling Counter Active Smooth State */
 .rolling-counter-val {
     transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 0.15s ease;
@@ -235,7 +237,6 @@ body {
     transform: scale(1.04);
     text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
 }
-
 
 /* 3D Holographic Tilt & Dynamic Glare */
 .cards-3d-perspective-container {
@@ -271,4 +272,71 @@ body {
 .fintech-plan-card.tilt-active {
     box-shadow: 0 15px 35px -8px rgba(0, 0, 0, 0.4), 0 0 25px -5px rgba(16, 185, 129, 0.25);
     z-index: 10;
+}
+
+/* =========================================================
+   Option 4: Logo Pulse & Staggered Ripple Wave (0.55s Fluid)
+   ========================================================= */
+.logo-intro-pulse {
+    animation: logoPulseWave 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    position: relative;
+}
+
+@keyframes logoPulseWave {
+    0% {
+        transform: scale(0.85);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.85);
+    }
+    45% {
+        transform: scale(1.1);
+        box-shadow: 0 0 25px 8px rgba(16, 185, 129, 0.45);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* Staggered Component Ripple Cascading Classes */
+.ripple-item-1 { animation: rippleSlideDown 0.45s 0.08s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.ripple-item-2 { animation: rippleSlideDown 0.45s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.ripple-item-3 { animation: rippleSlideDown 0.45s 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.ripple-item-4 { animation: rippleSlideDown 0.45s 0.30s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+@keyframes rippleSlideDown {
+    0% {
+        opacity: 0;
+        transform: translateY(14px) scale(0.985);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Expanding Radial Ripple Scan Beam */
+.logo-ripple-ring {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid rgba(16, 185, 129, 0.65);
+    pointer-events: none;
+    z-index: 5;
+    animation: expandRippleRing 0.8s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes expandRippleRing {
+    0% {
+        transform: scale(1);
+        opacity: 0.95;
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
+    }
+    100% {
+        transform: scale(22);
+        opacity: 0;
+        box-shadow: 0 0 40px rgba(16, 185, 129, 0);
+    }
 }
