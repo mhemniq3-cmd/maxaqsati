@@ -1,0 +1,274 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800;900&display=swap');
+
+:root {
+    /* Dark Mode (Default Executive Obsidian) */
+    --bg-page: #080b11;
+    --bg-frame: #0d121c;
+    --bg-card: #121824;
+    --bg-card-subtle: #0f141f;
+    --bg-input: #0a0e17;
+    --border-subtle: #1c2538;
+    --border-active: #2a3750;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --emerald-glow: rgba(16, 185, 129, 0.25);
+    --emerald-border: #10b981;
+    --emerald-pill-bg: #059669;
+    --orange-glow: rgba(249, 115, 22, 0.25);
+    --orange-border: #f97316;
+    --orange-pill-bg: #ea580c;
+    --plan-stat-bg: rgba(10, 14, 23, 0.7);
+    --frame-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 40px -10px rgba(16, 185, 129, 0.15);
+}
+
+html.light {
+    /* Light Mode (Classic Warm Pearl & Slate) */
+    --bg-page: #f1f4f9;
+    --bg-frame: #ffffff;
+    --bg-card: #f8fafc;
+    --bg-card-subtle: #f1f5f9;
+    --bg-input: #ffffff;
+    --border-subtle: #e2e8f0;
+    --border-active: #cbd5e1;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --emerald-glow: rgba(5, 150, 105, 0.15);
+    --emerald-border: #059669;
+    --emerald-pill-bg: #059669;
+    --orange-glow: rgba(234, 88, 12, 0.15);
+    --orange-border: #ea580c;
+    --orange-pill-bg: #ea580c;
+    --plan-stat-bg: #f8fafc;
+    --frame-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.08), 0 0 25px -5px rgba(5, 150, 105, 0.08);
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: 'Tajawal', sans-serif;
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+    min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.font-heading {
+    font-family: 'Cairo', sans-serif;
+}
+
+/* Outer Executive Frame */
+.executive-frame {
+    background-color: var(--bg-frame);
+    border: 1px solid var(--border-subtle);
+    box-shadow: var(--frame-shadow);
+    transition: all 0.3s ease;
+}
+
+/* Inner Fintech Cards */
+.fintech-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    transition: all 0.25s ease;
+}
+
+.fintech-input {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.fintech-input:focus {
+    border-color: var(--emerald-border);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--emerald-glow);
+}
+
+/* Plan Cards */
+.fintech-plan-card {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fintech-plan-card:hover {
+    border-color: var(--border-active);
+    transform: translateY(-2px);
+}
+
+.fintech-plan-card.active-platform {
+    border-color: var(--emerald-border) !important;
+    background: linear-gradient(180deg, rgba(16, 185, 129, 0.12) 0%, var(--bg-card) 100%);
+    box-shadow: 0 4px 20px -3px var(--emerald-glow);
+    transform: translateY(-2px);
+}
+
+.fintech-plan-card.active-manual {
+    border-color: var(--orange-border) !important;
+    background: linear-gradient(180deg, rgba(249, 115, 22, 0.12) 0%, var(--bg-card) 100%);
+    box-shadow: 0 4px 20px -3px var(--orange-glow);
+    transform: translateY(-2px);
+}
+
+.plan-stat-box {
+    background-color: var(--plan-stat-bg);
+    border: 1px solid var(--border-subtle);
+}
+
+/* Quick Chips */
+.fintech-chip {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    transition: all 0.15s ease;
+}
+
+.fintech-chip:hover {
+    color: var(--text-primary);
+    border-color: var(--emerald-border);
+    background-color: var(--emerald-glow);
+}
+
+.fintech-chip:active {
+    transform: scale(0.95);
+}
+
+/* Luxury Theme Toggle Pill */
+.theme-switch-pill {
+    background-color: var(--bg-input);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-switch-pill:hover {
+    border-color: var(--border-active);
+    color: var(--text-primary);
+}
+
+.theme-switch-pill:active {
+    transform: scale(0.96);
+}
+
+/* Glowing Action Button */
+.btn-emerald-glow {
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
+    transition: all 0.2s ease;
+}
+
+.btn-emerald-glow:hover {
+    background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+}
+
+.btn-emerald-glow:active {
+    transform: scale(0.97);
+}
+
+/* Subtle Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-page);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-subtle);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+}
+
+
+/* Copy Flash Glow Transition */
+@keyframes copyPulseGlow {
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        border-color: #10b981;
+    }
+    50% {
+        box-shadow: 0 0 25px 5px rgba(16, 185, 129, 0.45);
+        border-color: #34d399;
+        transform: scale(1.003);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        transform: scale(1);
+    }
+}
+
+.copy-glow-active {
+    animation: copyPulseGlow 0.8s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+
+/* Rolling Counter Active Smooth State */
+.rolling-counter-val {
+    transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), text-shadow 0.15s ease;
+    display: inline-block;
+    will-change: transform, text-shadow;
+}
+
+.rolling-counter-active {
+    transform: scale(1.04);
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+
+/* 3D Holographic Tilt & Dynamic Glare */
+.cards-3d-perspective-container {
+    perspective: 1200px;
+}
+
+.fintech-plan-card {
+    transform-style: preserve-3d;
+    will-change: transform, box-shadow;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.fintech-plan-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.14) 0%, rgba(16, 185, 129, 0.08) 35%, transparent 65%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    transform: translateZ(20px);
+}
+
+.fintech-plan-card:hover::after {
+    opacity: 1;
+}
+
+.fintech-plan-card.tilt-active {
+    box-shadow: 0 15px 35px -8px rgba(0, 0, 0, 0.4), 0 0 25px -5px rgba(16, 185, 129, 0.25);
+    z-index: 10;
+}
