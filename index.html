@@ -6,10 +6,10 @@
     <title>حاسبة نسبة اقساط مكتب ماكس</title>
     
     <!-- PWA & Mobile Meta Tags with Luxury Favicon & App Icons -->
-    <link rel="manifest" href="manifest.json?v=23">
-    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=23">
-    <link rel="icon" type="image/png" sizes="64x64" href="favicon.png?v=23">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=23">
+    <link rel="manifest" href="manifest.json?v=25">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=25">
+    <link rel="icon" type="image/png" sizes="64x64" href="favicon.png?v=25">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=25">
     <meta name="theme-color" content="#f1f4f9">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -36,8 +36,8 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Universal CSS Loader (Root & Subfolder Safe) -->
-    <link rel="stylesheet" href="styles.css?v=23" onerror="this.onerror=null;this.href='css/styles.css?v=23';">
+    <!-- Custom Fintech Luxury Styles -->
+    <link rel="stylesheet" href="styles.css?v=25">
 </head>
 <body class="flex items-center justify-center p-3 sm:p-6 lg:p-10 selection:bg-emerald-500 selection:text-white transition-colors duration-300">
     
@@ -439,7 +439,7 @@
                         <div class="flex items-center justify-between text-xs">
                             <span class="text-slate-300 font-medium">14 شهر:</span>
                             <div class="relative w-20">
-                                <input type="number" id="set_p14" step="0.1" min="0" class="w-full fintech-input rounded-xl py-2 px-2 text-center font-bold text-slate-100 text-xs">
+                                <input type="number" id="set_p14" step="0.1" min="0" class="w-full fintech-input rounded-xl py-1 px-2 text-center font-bold text-slate-100 text-xs">
                                 <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">%</span>
                             </div>
                         </div>
@@ -628,40 +628,16 @@
         <span id="toastMessage" class="text-xs font-bold">تم حفظ التغييرات</span>
     </div>
 
-    <!-- Universal Script Loader: Loads from Root or js/ directory smoothly -->
-    <script>
-        (function() {
-            const scripts = [
-                'security.js',
-                'audio.js',
-                'data.js',
-                'calculations.js',
-                'state.js',
-                'kiosk.js',
-                'render.js',
-                'events.js',
-                'actions.js',
-                'pwa.js'
-            ];
-            
-            function loadScriptSequentially(index) {
-                if (index >= scripts.length) return;
-                const name = scripts[index];
-                const script = document.createElement('script');
-                script.src = name + '?v=23';
-                script.onload = () => loadScriptSequentially(index + 1);
-                script.onerror = () => {
-                    // Fallback to js/ subfolder
-                    const fallback = document.createElement('script');
-                    fallback.src = 'js/' + name + '?v=23';
-                    fallback.onload = () => loadScriptSequentially(index + 1);
-                    document.body.appendChild(fallback);
-                };
-                document.body.appendChild(script);
-            }
-            
-            loadScriptSequentially(0);
-        })();
-    </script>
+    <!-- Standard Reliable Synchronous Scripts -->
+    <script src="security.js?v=25"></script>
+    <script src="audio.js?v=25"></script>
+    <script src="data.js?v=25"></script>
+    <script src="calculations.js?v=25"></script>
+    <script src="state.js?v=25"></script>
+    <script src="kiosk.js?v=25"></script>
+    <script src="render.js?v=25"></script>
+    <script src="events.js?v=25"></script>
+    <script src="actions.js?v=25"></script>
+    <script src="pwa.js?v=25"></script>
 </body>
 </html>
