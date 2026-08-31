@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>حاسبة نسبة اقساط مكتب ماكس</title>
+    
+    <!-- PWA & Mobile Meta Tags with Luxury Favicon & App Icons -->
+    <link rel="manifest" href="manifest.json?v=22">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=22">
+    <link rel="icon" type="image/png" sizes="64x64" href="icons/favicon.png?v=22">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png?v=22">
+    <meta name="theme-color" content="#f1f4f9">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="مكتب ماكس">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#10b981',
+                            600: '#059669',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom Fintech Luxury Styles -->
+    <link rel="stylesheet" href="css/styles.css?v=22">
+</head>
+<body class="flex items-center justify-center p-3 sm:p-6 lg:p-10 selection:bg-emerald-500 selection:text-white transition-colors duration-300">
+    
+    <!-- Main Executive Fintech Canvas (Design A) -->
+    <div class="max-w-4xl w-full mx-auto executive-frame rounded-[28px] p-5 sm:p-8 space-y-6 shadow-2xl relative">
+
+        <!-- Executive Navbar with Unified Control Island -->
+        <header class="flex flex-col sm:flex-row items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800/80 no-print">
+            <!-- Brand Logo & Title -->
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-500 p-0.5 shadow-md flex items-center justify-center">
+                        <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+                            <i data-lucide="calculator" class="w-5 h-5 text-emerald-400"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 id="storeNameDisplay" class="font-black text-lg sm:text-xl text-slate-900 dark:text-slate-100 font-heading tracking-tight">
+                                مكتب ماكس للتقسيط
+                            </h1>
+                            <div id="systemBadge"></div>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">حاسبة نسبة اقساط مكتب ماكس</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Harmonized Executive Control Island (شريط الأدوات الموحد) -->
+            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <!-- 1. Customer Kiosk Display Pill (Primary Highlight) -->
+                <button type="button" id="openKioskBtn"
+                        class="px-3.5 py-2 rounded-xl fintech-card hover:border-sky-500/60 text-sky-600 dark:text-sky-400 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer">
+                    <i data-lucide="monitor" class="w-3.5 h-3.5"></i>
+                    <span>شاشة الزبون 🖥️</span>
+                </button>
+
+                <!-- 2. Unified Quick Utility Capsule (Sound, Theme, Settings) -->
+                <div class="fintech-card rounded-xl p-1 flex items-center gap-1 shadow-sm border border-slate-200 dark:border-slate-800">
+                    <!-- Sound Toggle Button -->
+                    <button type="button" id="soundToggleBtn"
+                            class="px-2.5 py-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800/80 text-emerald-600 dark:text-emerald-400 text-xs font-bold transition flex items-center gap-1 active:scale-95 cursor-pointer"
+                            title="كتم / تفعيل المؤثرات الصوتية">
+                        <i data-lucide="volume-2" id="soundToggleIcon" class="w-3.5 h-3.5"></i>
+                        <span id="soundToggleLabel">صوت 🔊</span>
+                    </button>
+
+                    <div class="w-px h-4 bg-slate-200 dark:bg-slate-800"></div>
+
+                    <!-- Theme Toggle Button (Default: Light Mode -> Offers Switch to Dark) -->
+                    <button type="button" id="themeToggleBtn"
+                            class="px-2.5 py-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800/80 text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center gap-1 active:scale-95 cursor-pointer"
+                            title="تبديل المظهر (ليلي / نهاري)">
+                        <i data-lucide="moon" id="themeIcon" class="w-3.5 h-3.5 text-indigo-600"></i>
+                        <span id="themeLabel">ليلي 🌙</span>
+                    </button>
+
+                    <div class="w-px h-4 bg-slate-200 dark:bg-slate-800"></div>
+
+                    <!-- Settings Protected Button -->
+                    <button type="button" id="openSettingsBtn"
+                            class="px-2.5 py-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800/80 text-amber-600 dark:text-amber-400 text-xs font-bold transition flex items-center gap-1 active:scale-95 cursor-pointer"
+                            title="الاعدادات ونسب الفائدة">
+                        <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+                        <span>الاعدادات 🔒</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Centered Segmented 3-System Switcher -->
+        <div class="no-print flex justify-center">
+            <div class="fintech-card rounded-full p-1.5 flex w-full max-w-md gap-1.5 shadow-inner">
+                <button type="button" id="tabPlatform"
+                        class="flex-1 py-2.5 px-3 rounded-full font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all bg-emerald-600 text-white shadow-md cursor-pointer">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                    <span>تقسيط المنصة</span>
+                </button>
+
+                <button type="button" id="tabManual"
+                        class="flex-1 py-2.5 px-3 rounded-full font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 cursor-pointer">
+                    <i data-lucide="receipt" class="w-3.5 h-3.5"></i>
+                    <span>التسديد اليدوي</span>
+                </button>
+
+                <button type="button" id="tabOther"
+                        class="flex-1 py-2.5 px-3 rounded-full font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 cursor-pointer">
+                    <i data-lucide="landmark" class="w-3.5 h-3.5"></i>
+                    <span>خدمات أخرى 🏛️</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 1. Centered Input Desk Card (تفاصيل الجهاز والسعر) -->
+        <div class="fintech-card rounded-2xl p-5 sm:p-6 space-y-4 no-print shadow-sm">
+            <div class="flex items-center justify-between pb-2.5 border-b border-slate-200 dark:border-slate-800/80">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="smartphone" class="w-4 h-4 text-emerald-500"></i>
+                    <h2 class="font-black text-xs sm:text-sm text-slate-800 dark:text-slate-200 font-heading">تفاصيل الجهاز والسعر 📱</h2>
+                </div>
+                <button type="button" id="btnClearAll"
+                        class="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 dark:text-rose-400 text-xs font-bold transition flex items-center gap-1 active:scale-95 cursor-pointer">
+                    <i data-lucide="rotate-ccw" class="w-3 h-3"></i>
+                    <span>تفريغ الحقول 🧹</span>
+                </button>
+            </div>
+
+            <!-- Row 1: Product Name & Customer Phone (Hidden in Other Services) -->
+            <div id="rowProductNamePhone" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">اسم الجهاز / المنتج:</label>
+                    <input type="text" id="inputProductName" placeholder="مثال: iPhone 16 Pro Max 256GB"
+                           class="w-full fintech-input rounded-xl py-2.5 px-3.5 text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">رقم هاتف الزبون (للواتساب المباشر):</label>
+                    <input type="tel" id="inputCustomerPhone" placeholder="مثال: 07701234567"
+                           class="w-full fintech-input rounded-xl py-2.5 px-3.5 text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 font-mono placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none" dir="ltr">
+                </div>
+            </div>
+
+            <!-- Row 2: Cash Price & Down Payment with Real-time Spoken Words -->
+            <div id="rowPriceAndDp" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Cash Price -->
+                <div id="colPrincipal" class="space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400">سعر الجهاز نقداً (د.ع): <span class="text-rose-500">*</span></label>
+                        <span class="text-[10px] font-bold text-amber-500 font-mono">IQD</span>
+                    </div>
+                    <input type="number" id="inputPrincipal" value="1900000" min="1000" step="10000" placeholder="1900000"
+                           class="w-full fintech-input rounded-xl py-2.5 px-3.5 text-lg font-black text-slate-900 dark:text-slate-100 font-mono focus:outline-none">
+                    
+                    <!-- Live Spoken Words (Tafqeet) Badge -->
+                    <div id="principalSpokenWord" class="text-[11px] sm:text-xs font-black text-amber-500 dark:text-amber-400 font-heading pt-0.5 tracking-tight">« مليون و900 الف دينار »</div>
+
+                    <!-- Quick Amount Chips -->
+                    <div class="flex items-center gap-1.5 pt-0.5 overflow-x-auto pb-1 quick-chips">
+                        <button type="button" data-value="500000" class="amount-chip fintech-chip text-[11px] font-bold px-2 py-1 rounded-lg shrink-0">500k</button>
+                        <button type="button" data-value="1000000" class="amount-chip fintech-chip text-[11px] font-bold px-2 py-1 rounded-lg shrink-0">1M</button>
+                        <button type="button" data-value="1900000" class="amount-chip fintech-chip text-[11px] font-bold px-2 py-1 rounded-lg shrink-0">1.9M</button>
+                        <button type="button" data-value="2500000" class="amount-chip fintech-chip text-[11px] font-bold px-2 py-1 rounded-lg shrink-0">2.5M</button>
+                        <button type="button" data-value="5000000" class="amount-chip fintech-chip text-[11px] font-bold px-2 py-1 rounded-lg shrink-0">5M</button>
+                    </div>
+                </div>
+
+                <!-- Down Payment (Hidden in Other Services) -->
+                <div id="colDownPayment" class="space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-400">الواصل مقدماً (المقدمة) 💵:</label>
+                        <span class="text-[10px] text-slate-500 dark:text-slate-400">نقداً عند الشراء</span>
+                    </div>
+                    <div class="relative flex">
+                        <input type="number" id="inputDownPayment" value="200000" min="0" step="10000" placeholder="200000"
+                               class="w-full fintech-input rounded-r-xl py-2.5 px-3.5 text-lg font-black text-slate-900 dark:text-slate-100 font-mono focus:outline-none">
+                        <button type="button" id="downPaymentTypeBtn"
+                                class="px-3 fintech-input hover:bg-slate-200 dark:hover:bg-slate-800 rounded-l-xl text-xs font-bold text-slate-700 dark:text-slate-200 transition"
+                                title="تبديل بين دينار أو نسبة مئوية">
+                            د.ع
+                        </button>
+                    </div>
+
+                    <!-- Live Spoken Words (Tafqeet) Badge for Down Payment -->
+                    <div id="downPaymentSpokenWord" class="text-[11px] sm:text-xs font-black text-amber-500 dark:text-amber-400 font-heading pt-0.5 tracking-tight">« 200 الف دينار »</div>
+
+                    <!-- Quick Down Payment Chips -->
+                    <div class="flex items-center gap-1.5 pt-0.5 overflow-x-auto pb-1 quick-chips">
+                        <button type="button" data-dp-value="0" class="dp-chip fintech-chip text-[11px] font-bold px-2 py-1 rounded-lg shrink-0">بدون مقدمة</button>
+                        <button type="button" data-dp-value="50000" class="dp-chip fintech-chip text-[11px] font-bold px-2 py-1 rounded-lg shrink-0">50k</button>
+                        <button type="button" data-dp-value="100000" class="dp-chip fintech-chip text-[11px] font-bold px-2 py-1 rounded-lg shrink-0">100k</button>
+                        <button type="button" data-dp-value="200000" class="dp-chip fintech-chip text-[11px] font-bold px-2 py-1 rounded-lg shrink-0">200k</button>
+                        <button type="button" data-dp-value="250000" class="dp-chip fintech-chip text-[11px] font-bold px-2 py-1 rounded-lg shrink-0">250k</button>
+                        <button type="button" data-dp-value="500000" class="dp-chip fintech-chip text-[11px] font-bold px-2 py-1 rounded-lg shrink-0">500k</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Dynamic Plan Cards Row / Banking Section (3D Tilt Container) -->
+        <div class="space-y-2.5">
+            <div class="flex items-center justify-between px-1">
+                <span id="cardsSectionTitle" class="font-extrabold text-xs text-slate-800 dark:text-slate-300 font-heading">
+                    عروض وخطط السداد (10 - 18 شهر):
+                </span>
+                <span class="text-[11px] text-slate-500 dark:text-slate-400">تحديث فوري مع السعر</span>
+            </div>
+            
+            <div id="cardsContainer" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 cards-3d-perspective-container">
+                <!-- Dynamic Plan Cards (Rendered by JS) -->
+            </div>
+        </div>
+
+        <!-- 3. Customer Template & Action Buttons Card (تفاصيل الطلب) -->
+        <div class="fintech-card rounded-2xl p-5 sm:p-6 space-y-4 no-print shadow-sm">
+            <div class="flex items-center justify-between pb-2.5 border-b border-slate-200 dark:border-slate-800/80">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="clipboard-check" class="w-4 h-4 text-emerald-500"></i>
+                    <h3 class="font-black text-xs sm:text-sm text-slate-800 dark:text-slate-100 font-heading">تفاصيل الطلب ورسالة العرض</h3>
+                </div>
+                <span class="text-[11px] text-slate-500 dark:text-slate-400">تتحدث تلقائياً مع السعر والمقدمة</span>
+            </div>
+
+            <!-- Preview Textarea -->
+            <textarea id="templatePreviewBox" rows="6" readonly
+                      class="w-full fintech-input rounded-xl p-3.5 font-mono text-xs sm:text-sm text-slate-900 dark:text-slate-200 leading-relaxed focus:outline-none select-all resize-y transition-all duration-300"
+                      placeholder="جاري تجهيز رسالة العرض..."></textarea>
+
+            <!-- Bottom Action Buttons Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 pt-1">
+                <!-- Direct WhatsApp Button (Prominent Emerald Glow) -->
+                <button type="button" id="btnWhatsApp"
+                        class="sm:col-span-2 py-3 px-4 rounded-xl btn-emerald-glow text-white text-xs font-black transition flex items-center justify-center gap-2 active:scale-95 shadow-md cursor-pointer"
+                        title="إرسال مباشر للزبون عبر واتساب">
+                    <i data-lucide="message-square" class="w-4 h-4"></i>
+                    <span>ارسال عبر واتساب 💬</span>
+                </button>
+
+                <!-- Copy All Plans Button -->
+                <button type="button" id="btnCopyTemplate"
+                        class="py-3 px-3 rounded-xl fintech-card hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-100 text-xs font-bold transition flex items-center justify-center gap-1.5 active:scale-95 shadow-sm cursor-pointer">
+                    <i data-lucide="copy" class="w-4 h-4 text-emerald-500"></i>
+                    <span>نسخ الرسالة 📋</span>
+                </button>
+
+                <!-- Copy Selected Plan Button -->
+                <button type="button" id="btnCopySinglePlan"
+                        class="py-3 px-3 rounded-xl fintech-card hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold transition flex items-center justify-center gap-1.5 active:scale-95 shadow-sm cursor-pointer">
+                    <i data-lucide="file-text" class="w-4 h-4 text-amber-500"></i>
+                    <span>نسخ الخطة المحددة</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 4. Luxury Executive Footer with Credits -->
+        <footer class="pt-4 pb-1 border-t border-slate-200 dark:border-slate-800/80 text-center no-print flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
+            <div class="flex items-center gap-2 font-mono">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>النظام المالي المتقدم للتقسيط • 2026</span>
+            </div>
+            
+            <!-- Developer Copyright Badge -->
+            <div class="flex items-center gap-1.5 font-bold">
+                <span>تطوير وبرمجة:</span>
+                <span class="px-3 py-1 rounded-xl bg-gradient-to-r from-emerald-500/15 via-teal-500/15 to-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-mono font-black tracking-wider border border-emerald-500/30 shadow-sm inline-flex items-center gap-1">
+                    <span>BY : MUHEMN-MAX</span>
+                    <span class="text-amber-400">💎</span>
+                </span>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Luxury Kiosk Mode Fullscreen Overlay -->
+    <div id="kioskOverlay" class="fixed inset-0 z-50 bg-slate-950/98 backdrop-blur-2xl flex flex-col justify-between p-6 sm:p-10 overflow-y-auto hidden">
+        <!-- Kiosk Header -->
+        <div class="flex items-center justify-between gap-4 pb-6 border-b border-slate-800/80">
+            <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-amber-500 p-0.5 shadow-lg shadow-emerald-500/20">
+                    <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+                        <i data-lucide="sparkles" class="w-6 h-6 text-emerald-400"></i>
+                    </div>
+                </div>
+                <div>
+                    <h2 id="kioskStoreName" class="font-black text-2xl text-white font-heading">
+                        مكتب ماكس للتقسيط
+                    </h2>
+                    <p class="text-xs text-slate-400">شاشة العرض المباشرة للزبائن</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <div id="kioskSystemBadge"></div>
+                <button type="button" onclick="window.KioskSystem.openSecondScreenWindow()" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs font-bold text-sky-400 hover:text-white transition">
+                    فتح في شاشة خارجية ↗
+                </button>
+                <button type="button" onclick="window.KioskSystem.closeKiosk()" class="w-10 h-10 rounded-xl bg-slate-900 border border-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition" title="إغلاق شاشة العرض">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Center Price Showcase Banner -->
+        <div class="my-6">
+            <div class="fintech-card rounded-3xl p-6 sm:p-8 border border-slate-800 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 flex flex-col sm:flex-row items-center justify-around gap-6 text-center shadow-2xl">
+                <div>
+                    <span class="text-xs sm:text-sm font-bold text-slate-400 block mb-1">سعر السلعة / الجهاز نقداً:</span>
+                    <span id="kioskCashPrice" class="font-black text-3xl sm:text-4xl text-white font-mono tracking-tight">0 د.ع</span>
+                </div>
+                <div class="w-full sm:w-px h-px sm:h-12 bg-slate-800"></div>
+                <div>
+                    <span class="text-xs sm:text-sm font-bold text-slate-400 block mb-1">المقدمة (المبلغ الواصل):</span>
+                    <span id="kioskDownPayment" class="font-black text-3xl sm:text-4xl text-amber-400 font-mono tracking-tight">بدون مقدمة</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5 Duration Plans Luxury Grid -->
+        <div class="flex-1 my-4">
+            <div class="mb-4 text-center">
+                <span class="text-xs font-black uppercase tracking-widest text-slate-400">عروض الأقساط المتاحة:</span>
+            </div>
+            <div id="kioskCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
+                <!-- Rendered by KioskSystem -->
+            </div>
+        </div>
+
+        <!-- Kiosk Footer with Branding & Credits -->
+        <div class="pt-6 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-500 font-medium">
+            <span>شاشة العرض المباشرة للزبائن • المبالغ بالدينار العراقي (IQD)</span>
+            <span class="font-mono text-slate-400">BY : MUHEMN-MAX 💎</span>
+        </div>
+    </div>
+
+    <!-- Password Modal (Anti-Brute Force Protected) -->
+    <div id="passwordModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm hidden no-print">
+        <div class="fintech-card rounded-3xl max-w-md w-full p-6 sm:p-7 space-y-5 shadow-2xl">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-amber-500/20 flex items-center justify-center text-amber-400">
+                        <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-base text-slate-100 font-heading">حماية الإعدادات المشفرة</h3>
+                        <p class="text-xs text-slate-400">أدخل كلمة المرور لتعديل النسب (مشفرة بـ SHA-256)</p>
+                    </div>
+                </div>
+                <button type="button" id="closePasswordModalBtn" class="text-slate-400 hover:text-white p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Lockout Countdown Banner -->
+            <div id="lockoutBanner" class="p-2.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs font-bold text-center hidden"></div>
+
+            <div class="space-y-3">
+                <label class="block text-xs font-bold text-slate-300">
+                    كلمة المرور:
+                </label>
+                <div class="relative">
+                    <input type="password" id="passwordInput" placeholder="••••"
+                           class="w-full fintech-input rounded-2xl py-3 px-4 text-center font-black text-xl tracking-widest text-slate-100 focus:border-amber-500 focus:outline-none transition font-mono">
+                </div>
+                <p id="passwordErrorMsg" class="text-xs font-bold text-rose-400 hidden text-center">
+                    ❌ كلمة المرور غير صحيحة، يرجى المحاولة مجدداً
+                </p>
+            </div>
+
+            <div class="flex items-center gap-2 pt-2">
+                <button type="button" onclick="closePasswordModal()" class="flex-1 py-2.5 rounded-xl text-xs font-bold fintech-card text-slate-300 hover:bg-slate-800 transition">
+                    إلغاء
+                </button>
+                <button type="button" id="submitPasswordBtn" onclick="checkPasswordAndOpen()" class="flex-1 py-2.5 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white transition shadow-md">
+                    دخول وتعديل
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal (Protected - Full Control for 3 Systems + Encrypted Backup) -->
+    <div id="settingsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden no-print">
+        <div class="fintech-card rounded-3xl max-w-3xl w-full p-6 sm:p-8 space-y-6 shadow-2xl overflow-y-auto max-h-[92vh]">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                        <i data-lucide="settings" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-extrabold text-lg text-slate-100 font-heading">لوحة التحكم في النسب والفوائد</h3>
+                        <p class="text-xs text-slate-400">تعديل نسب تقسيط المنصة، التسديد اليدوي، والخدمات المصرفية</p>
+                    </div>
+                </div>
+                <button type="button" id="closeSettingsBtn" class="text-slate-400 hover:text-white p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Three Columns for System Rates (Platform, Manual, Other Services) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- 1. Platform System Rates (Green) -->
+                <div class="bg-emerald-950/20 border border-emerald-500/20 rounded-2xl p-3.5 space-y-3">
+                    <div class="flex items-center gap-1.5 pb-2 border-b border-emerald-500/20">
+                        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+                        <h4 class="font-extrabold text-xs sm:text-sm text-emerald-300 font-heading">نسب تقسيط المنصة</h4>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-300 font-medium">10 أشهر:</span>
+                            <div class="relative w-20">
+                                <input type="number" id="set_p10" step="0.1" min="0" class="w-full fintech-input rounded-xl py-1 px-2 text-center font-bold text-slate-100 text-xs">
+                                <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">%</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-300 font-medium">12 شهر:</span>
+                            <div class="relative w-20">
+                                <input type="number" id="set_p12" step="0.1" min="0" class="w-full fintech-input rounded-xl py-1 px-2 text-center font-bold text-slate-100 text-xs">
+                                <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">%</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-300 font-medium">14 شهر:</span>
+                            <div class="relative w-20">
+                                <input type="number" id="set_p14" step="0.1" min="0" class="w-full fintech-input rounded-xl py-1 px-2 text-center font-bold text-slate-100 text-xs">
+                                <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">%</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-300 font-medium">16 شهر:</span>
+                            <div class="relative w-20">
+                                <input type="number" id="set_p16" step="0.1" min="0" class="w-full fintech-input rounded-xl py-1 px-2 text-center font-bold text-slate-100 text-xs">
+                                <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">%</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-300 font-medium">18 شهر:</span>
+                            <div class="relative w-20">
+                                <input type="number" id="set_p18" step="0.1" min="0" class="w-full fintech-input rounded-xl py-1 px-2 text-center font-bold text-slate-100 text-xs">
+                                <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Manual Payment System Rates (Orange) -->
+                <div class="bg-orange-950/20 border border-orange-500/20 rounded-2xl p-3.5 space-y-3">
+                    <div class="flex items-center gap-1.5 pb-2 border-b border-orange-500/20">
+                        <i data-lucide="receipt" class="w-4 h-4 text-orange-400"></i>
+                        <h4 class="font-extrabold text-xs sm:text-sm text-orange-300 font-heading">نسب التسديد اليدوي</h4>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-300 font-medium">10 أشهر:</span>
+                            <div class="relative w-20">
+                                <input type="number" id="set_m10" step="0.1" min="0" class="w-full fintech-input rounded-xl py-1 px-2 text-center font-bold text-slate-100 text-xs">
+                                <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">%</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-300 font-medium">12 شهر:</span>
+                            <div class="relative w-20">
+                                <input type="number" id="set_m12" step="0.1" min="0" class="w-full fintech-input rounded-xl py-1.5 px-3 text-center font-bold text-slate-100 text-xs">
+                                <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">%</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-300 font-medium">14 شهر:</span>
+                            <div class="relative w-20">
+                                <input type="number" id="set_m14" step="0.1" min="0" class="w-full fintech-input rounded-xl py-1 px-2 text-center font-bold text-slate-100 text-xs">
+                                <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">%</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-300 font-medium">16 شهر:</span>
+                            <div class="relative w-20">
+                                <input type="number" id="set_m16" step="0.1" min="0" class="w-full fintech-input rounded-xl py-1 px-2 text-center font-bold text-slate-100 text-xs">
+                                <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">%</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-300 font-medium">18 شهر:</span>
+                            <div class="relative w-20">
+                                <input type="number" id="set_m18" step="0.1" min="0" class="w-full fintech-input rounded-xl py-1 px-2 text-center font-bold text-slate-100 text-xs">
+                                <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Other Services & Banking Rates (Sky Blue & Purple) -->
+                <div class="bg-sky-950/20 border border-sky-500/20 rounded-2xl p-3.5 space-y-3">
+                    <div class="flex items-center gap-1.5 pb-2 border-b border-sky-500/20">
+                        <i data-lucide="landmark" class="w-4 h-4 text-sky-400"></i>
+                        <h4 class="font-extrabold text-xs sm:text-sm text-sky-300 font-heading">الخدمات المصرفية والأخرى</h4>
+                    </div>
+                    <div class="space-y-2">
+                        <!-- Rafidain Bank -->
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-300 font-medium">🏛️ الرافدين (فائدة ثابتة):</span>
+                            <div class="relative w-20">
+                                <input type="number" id="set_raf_rate" step="0.1" min="0" class="w-full fintech-input rounded-xl py-1 px-2 text-center font-bold text-slate-100 text-xs">
+                                <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">%</span>
+                            </div>
+                        </div>
+                        <!-- Ahli & Rasheed -->
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-300 font-medium">🏦 الأهلي والرشيد (شهرياً):</span>
+                            <div class="relative w-20">
+                                <input type="number" id="set_ahli_rate" step="0.1" min="0" class="w-full fintech-input rounded-xl py-1 px-2 text-center font-bold text-slate-100 text-xs">
+                                <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">%</span>
+                            </div>
+                        </div>
+                        <!-- Pay at Salary Customer Fee -->
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-300 font-medium">🔵 سلفة الراتب (رسوم زبون):</span>
+                            <div class="relative w-20">
+                                <input type="number" id="set_sal_cust_fee" step="500" min="0" class="w-full fintech-input rounded-xl py-1 px-2 text-center font-bold text-slate-100 text-xs font-mono">
+                                <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[9px] text-slate-400">د.ع</span>
+                            </div>
+                        </div>
+                        <!-- Pay at Salary Merchant Fee -->
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-300 font-medium">🔵 عمولة التاجر بالسلفة:</span>
+                            <div class="relative w-20">
+                                <input type="number" id="set_sal_merch_fee" step="0.1" min="0" class="w-full fintech-input rounded-xl py-1 px-2 text-center font-bold text-slate-100 text-xs">
+                                <span class="absolute left-1.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Options, Store Info, Rounding & Password Change -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-800 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-300 mb-1.5">اسم المتجر / المعرض</label>
+                    <input type="text" id="settingStoreName" class="w-full fintech-input rounded-xl py-2 px-3 text-slate-100 font-semibold">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-300 mb-1.5">طريقة احتساب النسبة</label>
+                    <select id="settingCalcMode" class="w-full fintech-input rounded-xl py-2 px-3 text-slate-100 font-semibold">
+                        <option value="flat">نسبة إجمالية ثابتة على كامل المدة</option>
+                        <option value="annual">نسبة سنوية موزعة حسب عدد الأشهر</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-300 mb-1.5">🔢 تقريب القسط الشهري (Smart Cash Rounding)</label>
+                    <select id="settingRoundingMode" class="w-full fintech-input rounded-xl py-2 px-3 text-emerald-400 font-bold">
+                        <option value="none">بدون تقريب (القسط الدقيق)</option>
+                        <option value="1000">تقريب لأعلى لأقرب 1,000 د.ع (موصى به للتعامل النقدي)</option>
+                        <option value="5000">تقريب لأعلى لأقرب 5,000 د.ع</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-300 mb-1.5">رقم الهاتف (يظهر بنهاية الكليشة للتواصل)</label>
+                    <input type="text" id="settingStorePhone" placeholder="مثال: 0770XXXXXXX" class="w-full fintech-input rounded-xl py-2 px-3 text-slate-100 font-mono">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-300 mb-1.5">عنوان المحل / الفرع (يظهر بنهاية الكليشة)</label>
+                    <input type="text" id="settingStoreAddress" placeholder="مثال: بغداد - الكرادة" class="w-full fintech-input rounded-xl py-2 px-3 text-slate-100">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-300 mb-1.5">تغيير كلمة السر (مشفرة)</label>
+                    <input type="password" id="newPasswordInput" placeholder="اتركه فارغاً لعدم التغيير" class="w-full fintech-input rounded-xl py-2 px-3 text-slate-100">
+                </div>
+            </div>
+
+            <!-- Encrypted Backup & Restore Bar -->
+            <div class="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+                    <div>
+                        <span class="font-bold text-slate-200 block">النسخ الاحتياطي المشفر</span>
+                        <span class="text-[11px] text-slate-400">حفظ أو نقل كامل إعداداتك ونسبك بملف آمن</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <button type="button" id="btnExportBackup" class="flex-1 sm:flex-none px-3.5 py-2 rounded-xl fintech-card text-emerald-400 hover:text-white text-xs font-bold transition flex items-center justify-center gap-1.5">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                        <span>تصدير نسخة 💾</span>
+                    </button>
+                    <button type="button" id="btnImportBackup" class="flex-1 sm:flex-none px-3.5 py-2 rounded-xl fintech-card text-sky-400 hover:text-white text-xs font-bold transition flex items-center justify-center gap-1.5">
+                        <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                        <span>استيراد نسخة 📂</span>
+                    </button>
+                    <input type="file" id="fileImportInput" accept=".json" class="hidden">
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="flex items-center justify-between pt-4 border-t border-slate-800">
+                <button type="button" id="resetRatesBtn" class="text-xs font-bold text-rose-400 hover:text-rose-300 transition">
+                    استعادة النسب الافتراضية
+                </button>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="closeSettingsModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-300 fintech-card hover:bg-slate-800 transition">
+                        إلغاء
+                    </button>
+                    <button type="button" id="saveSettingsBtn" class="px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition shadow-md">
+                        حفظ النسب والتعديلات
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 px-5 py-3 rounded-2xl fintech-card text-white shadow-2xl flex items-center gap-3 opacity-0 translate-y-4 pointer-events-none transition-all duration-300 border border-slate-700">
+        <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+        <span id="toastMessage" class="text-xs font-bold">تم حفظ التغييرات</span>
+    </div>
+
+    <!-- Application Scripts with Cache-Busting Version v=22 -->
+    <script src="js/security.js?v=22"></script>
+    <script src="js/audio.js?v=22"></script>
+    <script src="js/data.js?v=22"></script>
+    <script src="js/calculations.js?v=22"></script>
+    <script src="js/state.js?v=22"></script>
+    <script src="js/kiosk.js?v=22"></script>
+    <script src="js/render.js?v=22"></script>
+    <script src="js/events.js?v=22"></script>
+    <script src="js/actions.js?v=22"></script>
+    <script src="js/pwa.js?v=22"></script>
+</body>
+</html>

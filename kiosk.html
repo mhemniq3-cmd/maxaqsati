@@ -1,0 +1,114 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>شاشة عروض التقسيط للزبائن</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icons/favicon.png">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-emerald-500 selection:text-white flex flex-col justify-between p-6 sm:p-10">
+
+    <!-- Top Luxury Header -->
+    <header class="flex flex-col sm:flex-row items-center justify-between gap-4 pb-6 border-b border-slate-800/80">
+        <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-3xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-amber-500 p-0.5 shadow-xl shadow-emerald-500/20">
+                <div class="w-full h-full bg-slate-950 rounded-[22px] flex items-center justify-center">
+                    <i data-lucide="sparkles" class="w-7 h-7 text-emerald-400"></i>
+                </div>
+            </div>
+            <div>
+                <h1 id="kioskStoreName" class="font-black text-2xl sm:text-3xl text-white font-heading tracking-tight">
+                    نظام حساب الأقساط
+                </h1>
+                <p class="text-sm text-slate-400 mt-0.5">أهلاً بكم - اختر خطة الأقساط الأنسب لميزانيتك</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <div id="kioskSystemBadge"></div>
+            <button type="button" onclick="toggleFullscreen()" class="px-4 py-2 rounded-2xl bg-slate-900 border border-slate-700 text-xs font-bold text-slate-300 hover:text-white">
+                ملء الشاشة ⛶
+            </button>
+        </div>
+    </header>
+
+    <!-- Center Price Showcase Banner -->
+    <div class="my-6">
+        <div class="glass-card rounded-3xl p-6 sm:p-8 border border-slate-800 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 flex flex-col sm:flex-row items-center justify-around gap-6 text-center shadow-2xl">
+            <div>
+                <span class="text-xs sm:text-sm font-bold text-slate-400 block mb-1">سعر السلعة / الجهاز نقداً:</span>
+                <span id="kioskCashPrice" class="font-black text-3xl sm:text-4xl text-white font-mono tracking-tight">0 د.ع</span>
+            </div>
+            <div class="w-full sm:w-px h-px sm:h-12 bg-slate-800"></div>
+            <div>
+                <span class="text-xs sm:text-sm font-bold text-slate-400 block mb-1">المقدمة (المبلغ الواصل):</span>
+                <span id="kioskDownPayment" class="font-black text-3xl sm:text-4xl text-amber-400 font-mono tracking-tight">بدون مقدمة</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5 Luxury Plan Cards Grid -->
+    <main class="flex-1 my-4">
+        <div class="mb-4 text-center">
+            <span class="text-xs font-black uppercase tracking-widest text-slate-400">عروض الأقساط المتاحة:</span>
+        </div>
+        <div id="kioskCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
+            <!-- Rendered by JS -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="pt-6 border-t border-slate-800/80 text-center text-xs text-slate-500 font-medium">
+        شاشة العرض المباشرة للزبائن • المبالغ بالدينار العراقي (IQD)
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/calculations.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/kiosk.js"></script>
+    <script>
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            } else {
+                document.exitFullscreen().catch(() => {});
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initElements();
+            window.KioskSystem.isOpen = true;
+            window.KioskSystem.renderKiosk();
+            if (window.lucide) window.lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
