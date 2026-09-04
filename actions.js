@@ -244,6 +244,128 @@ window.checkPasswordAndOpen = async function() {
     }
 };
 
+window.switchSettingsTab = function(tabId) {
+    const tabs = ['scanner', 'catalog', 'rates', 'store', 'cloud', 'security'];
+    tabs.forEach(t => {
+        const btn = document.getElementById(`tabBtn_${t}`);
+        const pane = document.getElementById(`tabPane_${t}`);
+        if (btn) {
+            if (t === tabId) {
+                btn.className = 'px-3.5 py-2 rounded-xl text-xs font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm transition flex items-center gap-1.5 shrink-0 cursor-pointer';
+            } else {
+                btn.className = 'px-3.5 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent transition flex items-center gap-1.5 shrink-0 cursor-pointer';
+            }
+        }
+        if (pane) {
+            if (t === tabId) {
+                pane.classList.remove('hidden');
+            } else {
+                pane.classList.add('hidden');
+            }
+        }
+    });
+
+    if (tabId === 'catalog' && typeof window.renderSettingsCatalog === 'function') {
+        window.renderSettingsCatalog();
+    }
+    if (window.lucide) window.lucide.createIcons();
+};
+
+window.openSettingsWithTab = function(tabId = 'scanner') {
+    window.openSettingsModal();
+    window.switchSettingsTab(tabId);
+};
+
+window.renderSettingsCatalog = function() {
+    const tbody = document.getElementById('catalogDevicesTableBody');
+    const countBadge = document.getElementById('catalogDeviceCountBadge');
+    if (!tbody) return;
+    
+    const devices = window.AppState?.devices || [];
+    if (countBadge) countBadge.textContent = `${devices.length} جهاز`;
+    
+    if (devices.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center p-6 text-slate-400">لا توجد أجهزة مضافة حالياً. يمكنك تحديث الأسعار بالصور أو إضافة جهاز جديد أدناه.</td></tr>`;
+        return;
+    }
+    
+    tbody.innerHTML = devices.map((d, idx) => `
+        <tr class="hover:bg-slate-800/40 transition">
+            <td class="p-3 font-bold text-slate-100">${d.name}</td>
+            <td class="p-3 text-slate-400 text-xs">${d.specs || d.keys?.slice(0, 2).join(' | ') || '—'}</td>
+            <td class="p-3">
+                <div class="relative w-36">
+                    <input type="number" step="1000" min="0" value="${d.price}" 
+                           onchange="window.updateCatalogDevicePrice(${idx}, this.value)"
+                           class="w-full fintech-input rounded-xl py-1 px-2.5 text-center font-bold text-emerald-400 text-xs font-mono">
+                    <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-400">د.ع</span>
+                </div>
+            </td>
+            <td class="p-3 text-center">
+                <button type="button" onclick="window.deleteCatalogDevice(${idx})" class="w-7 h-7 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 flex items-center justify-center transition cursor-pointer mx-auto" title="حذف الجهاز">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+    if (window.lucide) window.lucide.createIcons();
+};
+
+window.updateCatalogDevicePrice = function(index, newPrice) {
+    const devices = window.AppState?.devices || [];
+    if (devices[index]) {
+        devices[index].price = Math.max(0, Number(newPrice) || 0);
+        window.InstallmentData.Storage.saveDevices(devices);
+        if (window.PriceScanner) window.PriceScanner.renderDeviceDatalist();
+        if (window.showToast) window.showToast(`✅ تم تحديث سعر ${devices[index].name}`);
+    }
+};
+
+window.deleteCatalogDevice = function(index) {
+    const devices = window.AppState?.devices || [];
+    if (!devices[index]) return;
+    if (!confirm(`هل أنت متأكد من حذف ${devices[index].name} من الكتالوج؟`)) return;
+    devices.splice(index, 1);
+    window.InstallmentData.Storage.saveDevices(devices);
+    if (window.PriceScanner) window.PriceScanner.renderDeviceDatalist();
+    window.renderSettingsCatalog();
+    if (window.showToast) window.showToast('🗑️ تم حذف الجهاز من الكتالوج');
+};
+
+window.addNewDeviceToCatalog = function() {
+    const nameInput = document.getElementById('newDevName');
+    const priceInput = document.getElementById('newDevPrice');
+    const specsInput = document.getElementById('newDevSpecs');
+    if (!nameInput || !priceInput) return;
+    
+    const name = nameInput.value.trim();
+    const price = Number(priceInput.value) || 0;
+    const specs = specsInput ? specsInput.value.trim() : '';
+    
+    if (!name || price <= 0) {
+        alert('يرجى كتابة اسم الجهاز وسعره نقداً بشكل صحيح');
+        return;
+    }
+    
+    const devices = window.AppState?.devices || [];
+    devices.unshift({
+        name,
+        price,
+        specs,
+        keys: [name.toLowerCase(), ...name.toLowerCase().split(' ')]
+    });
+    
+    window.InstallmentData.Storage.saveDevices(devices);
+    if (window.PriceScanner) window.PriceScanner.renderDeviceDatalist();
+    window.renderSettingsCatalog();
+    
+    nameInput.value = '';
+    priceInput.value = '';
+    if (specsInput) specsInput.value = '';
+    
+    if (window.showToast) window.showToast(`✨ تمت إضافة ${name} إلى الكتالوج بنجاح!`);
+};
+
 window.openSettingsModal = function() {
     const s = window.AppState;
     const modal = document.getElementById('settingsModal');
@@ -288,6 +410,7 @@ window.openSettingsModal = function() {
     if (newPassEl) newPassEl.value = '';
 
     modal.classList.remove('hidden');
+    if (window.lucide) window.lucide.createIcons();
 };
 
 window.closeSettingsModal = function() {
@@ -330,7 +453,7 @@ window.saveSettingsFromModal = function() {
     if (calcModeEl) s.settings.calculationMode = calcModeEl.value;
     if (roundingModeEl) s.settings.roundingMode = roundingModeEl.value;
     if (storePhoneEl) s.settings.storePhone = storePhoneEl.value;
-    if (storeAddressEl) storeAddressEl.value = storeAddressEl.value;
+    if (storeAddressEl) s.settings.storeAddress = storeAddressEl.value;
 
     if (newPassEl && newPassEl.value.trim().length > 0) {
         const newPass = newPassEl.value.trim();
@@ -422,6 +545,16 @@ function bootApplication() {
         // Initialize Global Cloud Sync Engine
         if (window.CloudSync && typeof window.CloudSync.init === 'function') {
             window.CloudSync.init();
+        }
+
+        // Initialize Max AI Sales Advisor Engine
+        if (window.MaxAIAdvisor && typeof window.MaxAIAdvisor.init === 'function') {
+            window.MaxAIAdvisor.init();
+        }
+
+        // Initialize AI Vision Price Sheet Scanner Engine
+        if (window.PriceScanner && typeof window.PriceScanner.init === 'function') {
+            window.PriceScanner.init();
         }
 
         // Bind Cloud Sync Buttons in Settings

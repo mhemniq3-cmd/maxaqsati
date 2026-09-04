@@ -1,4 +1,4 @@
-﻿window.AppState = {
+window.AppState = {
     currentSystem: 'platform', // 'platform' | 'manual' | 'other'
     otherSubService: 'all', // 'all' | 'rafidain' | 'ahli_rasheed' | 'salary_advance'
     selectedPlan: 10, // 10 | 12 | 14 | 16 | 18
@@ -9,6 +9,7 @@
     downPaymentType: 'fixed', // 'fixed' | 'percent'
     rates: window.InstallmentData.Storage.getRates(),
     settings: window.InstallmentData.Storage.getSettings(),
+    devices: window.InstallmentData.Storage.getDevices ? window.InstallmentData.Storage.getDevices() : [],
     tracking: window.InstallmentData.Storage.getTracking(),
     chart: null
 };
