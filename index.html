@@ -42,7 +42,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <!-- Custom Fintech Luxury Styles -->
-    <link rel="stylesheet" href="styles.css?v=48">
+    <link rel="stylesheet" href="styles.css?v=55">
 </head>
 <body class="flex items-center justify-center p-3 sm:p-6 lg:p-10 selection:bg-emerald-500 selection:text-white transition-colors duration-300">
 
@@ -100,13 +100,6 @@
                     <span>شاشة الزبون 🖥️</span>
                 </button>
 
-                <!-- AI Vision Price Sheet Scanner Button -->
-                <button type="button" id="openPriceScannerBtn" onclick="window.openSettingsWithTab ? window.openSettingsWithTab('scanner') : (window.openSettingsModal && window.openSettingsModal())"
-                        class="px-3.5 py-2 rounded-xl fintech-card hover:border-amber-500/60 text-amber-500 dark:text-amber-400 text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
-                        title="تحديث أسعار الأجهزة بالذكاء الاصطناعي عبر الصور">
-                    <i data-lucide="scan-line" class="w-3.5 h-3.5"></i>
-                    <span>تحديث بالصور 📷</span>
-                </button>
 
                 <!-- Unified Quick Utility Capsule (Sound, Theme, Settings) -->
                 <div class="fintech-card rounded-xl p-1 flex items-center gap-1 shadow-sm border border-slate-200 dark:border-slate-800">
@@ -131,7 +124,7 @@
                     <div class="w-px h-4 bg-slate-200 dark:bg-slate-800"></div>
 
                     <!-- Settings Protected Button -->
-                    <button type="button" id="openSettingsBtn" onclick="window.openSettingsModal && window.openSettingsModal()"
+                    <button type="button" id="openSettingsBtn" onclick="window.openProtectedSettings ? window.openProtectedSettings('rates') : window.promptPasswordForSettings()"
                             class="px-2.5 py-1.5 rounded-lg hover:bg-slate-200/70 dark:hover:bg-slate-800/80 text-amber-600 dark:text-amber-400 text-xs font-bold transition flex items-center gap-1 active:scale-95 cursor-pointer"
                             title="الاعدادات ونسب الفائدة">
                         <i data-lucide="settings" class="w-3.5 h-3.5"></i>
@@ -392,7 +385,7 @@
     </div>
 
     <!-- Password Modal (Anti-Brute Force Protected) -->
-    <div id="passwordModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm hidden no-print">
+    <div id="passwordModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm hidden no-print">
         <div class="fintech-card rounded-3xl max-w-md w-full p-6 sm:p-7 space-y-5 shadow-2xl">
             <div class="flex items-center justify-between pb-3 border-b border-slate-800">
                 <div class="flex items-center gap-3">
@@ -489,6 +482,11 @@
                     <i data-lucide="cloud" class="w-3.5 h-3.5"></i>
                     <span>☁️ السحابة والنسخ</span>
                 </button>
+                <button type="button" id="tabBtn_ai" onclick="window.switchSettingsTab('ai')"
+                        class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent transition flex items-center gap-1.5 shrink-0 cursor-pointer">
+                    <i data-lucide="bot" class="w-3.5 h-3.5"></i>
+                    <span>🤖 الذكاء الاصطناعي</span>
+                </button>
                 <button type="button" id="tabBtn_security" onclick="window.switchSettingsTab('security')"
                         class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent transition flex items-center gap-1.5 shrink-0 cursor-pointer">
                     <i data-lucide="lock" class="w-3.5 h-3.5"></i>
@@ -532,6 +530,46 @@
                         <span class="px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold">مدعوم بالذكاء الاصطناعي ✦</span>
                     </div>
 
+                    <!-- المبلغ الإضافي التلقائي للأجهزة (Markup Control Box) -->
+                    <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-slate-900/90 to-emerald-500/10 border border-amber-500/30 space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                                    <i data-lucide="badge-percent" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="text-sm font-black text-slate-100 font-heading">المبلغ الإضافي التلقائي للأجهزة (هامش الزيادة)</h4>
+                                        <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">تلقائي ⚡</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400 mt-0.5">
+                                        يُضاف تلقائياً لأي سعر مستخرج من الصورة (مثال: إذا استخرج السعر <span class="text-amber-300 font-mono font-bold">535 ألف</span>، يظهر مباشرة <span class="text-emerald-400 font-mono font-bold">550 ألف</span> دينار).
+                                    </p>
+                                </div>
+                            </div>
+                            <!-- Input -->
+                            <div class="flex items-center gap-2">
+                                <div class="relative w-40 sm:w-48">
+                                    <input type="number" id="settingScannerMarkup" step="1000" min="0" placeholder="15000"
+                                           oninput="window.handleScannerMarkupInput(this.value)"
+                                           class="w-full fintech-input rounded-xl py-2 px-3 text-left font-mono font-black text-emerald-400 text-sm focus:outline-none focus:border-amber-400">
+                                    <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 font-bold">د.ع</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Quick Presets -->
+                        <div class="flex items-center gap-1.5 flex-wrap pt-2 border-t border-slate-800/80 text-xs">
+                            <span class="text-slate-400 text-[11px] font-medium ml-1">تحديد سريع:</span>
+                            <button type="button" onclick="window.setScannerMarkupPreset(0)" class="markup-chip px-2.5 py-1 rounded-lg text-xs font-bold fintech-card hover:bg-slate-800 text-slate-300 transition cursor-pointer" data-val="0">0 (بدون إضافة)</button>
+                            <button type="button" onclick="window.setScannerMarkupPreset(5000)" class="markup-chip px-2.5 py-1 rounded-lg text-xs font-bold fintech-card hover:bg-slate-800 text-slate-300 transition cursor-pointer" data-val="5000">+5,000 د.ع</button>
+                            <button type="button" onclick="window.setScannerMarkupPreset(10000)" class="markup-chip px-2.5 py-1 rounded-lg text-xs font-bold fintech-card hover:bg-slate-800 text-slate-300 transition cursor-pointer" data-val="10000">+10,000 د.ع</button>
+                            <button type="button" onclick="window.setScannerMarkupPreset(15000)" class="markup-chip px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 transition cursor-pointer" data-val="15000">+15,000 د.ع ⭐ (مثالك)</button>
+                            <button type="button" onclick="window.setScannerMarkupPreset(20000)" class="markup-chip px-2.5 py-1 rounded-lg text-xs font-bold fintech-card hover:bg-slate-800 text-slate-300 transition cursor-pointer" data-val="20000">+20,000 د.ع</button>
+                            <button type="button" onclick="window.setScannerMarkupPreset(25000)" class="markup-chip px-2.5 py-1 rounded-lg text-xs font-bold fintech-card hover:bg-slate-800 text-slate-300 transition cursor-pointer" data-val="25000">+25,000 د.ع</button>
+                            <button type="button" onclick="window.setScannerMarkupPreset(30000)" class="markup-chip px-2.5 py-1 rounded-lg text-xs font-bold fintech-card hover:bg-slate-800 text-slate-300 transition cursor-pointer" data-val="30000">+30,000 د.ع</button>
+                        </div>
+                    </div>
+
                     <!-- Dropzone Area -->
                     <div id="scannerDropzone" class="border-2 border-dashed border-amber-500/40 hover:border-amber-400 bg-amber-950/10 hover:bg-amber-950/20 rounded-2xl p-6 sm:p-10 text-center transition cursor-pointer flex flex-col items-center justify-center gap-3 group">
                         <div class="w-16 h-16 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
@@ -564,6 +602,7 @@
                             <div class="flex items-center gap-2">
                                 <span class="text-xs sm:text-sm font-black text-slate-200 font-heading">الأجهزة المكتشفة بالصورة:</span>
                                 <span id="scannerDeviceCountBadge" class="px-2.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 text-xs font-mono font-bold">0 أجهزة</span>
+                                <span id="scannerMarkupAppliedBadge" class="px-2.5 py-0.5 rounded-md bg-amber-500/20 text-amber-300 text-xs font-mono font-bold">+15,000 د.ع مضافة</span>
                             </div>
                             <span class="text-xs text-slate-400">يمكنك تعديل أي سعر مباشرة في الجدول قبل الاعتماد</span>
                         </div>
@@ -575,7 +614,7 @@
                                     <tr>
                                         <th class="p-3">اسم الجهاز</th>
                                         <th class="p-3">المواصفات</th>
-                                        <th class="p-3">السعر نقداً (د.ع)</th>
+                                        <th class="p-3">السعر بعد الإضافة (د.ع)</th>
                                         <th class="p-3 text-center">إجراء</th>
                                     </tr>
                                 </thead>
@@ -622,6 +661,38 @@
                         </div>
                         <div class="flex items-center gap-2">
                             <span id="catalogDeviceCountBadge" class="px-3 py-1 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold">0 جهاز</span>
+                        </div>
+                    </div>
+
+                    <!-- Device Markup Control Box in Catalog (خانة الأجهزة) -->
+                    <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-slate-900/90 to-emerald-500/10 border border-amber-500/30 space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                                    <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="text-sm font-black text-slate-100 font-heading">المبلغ الإضافي التلقائي للأجهزة (هامش الربح)</h4>
+                                        <span id="catalogCurrentMarkupBadge" class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-mono font-bold">+15,000 د.ع</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400 mt-0.5">
+                                        يُضاف تلقائياً عند استخراج أسعار الأجهزة من الصور (مثلاً: 535 ألف تصبح 550 ألف تلقائياً)
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="window.switchSettingsTab('scanner')" class="px-3.5 py-2 rounded-xl fintech-card hover:bg-slate-800 text-slate-200 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer">
+                                    <i data-lucide="sliders" class="w-3.5 h-3.5 text-amber-400"></i>
+                                    <span>تعديل المبلغ ⚙️</span>
+                                </button>
+                                <button type="button" onclick="window.applyMarkupToCurrentCatalog()"
+                                        class="px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-sm"
+                                        title="زيادة جميع أسعار الأجهزة الحالية في الكتالوج بهذا المبلغ">
+                                    <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                                    <span>تطبيق الزيادة على الكتالوج الحالي ⚡</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -921,7 +992,99 @@
             </div>
 
             <!-- ========================================================= -->
-            <!-- TAB 6: 🔒 الأمان ورمز الحماية (Security) -->
+            <!-- TAB 6: 🤖 إعدادات الذكاء الاصطناعي (Google Gemini AI) -->
+            <!-- ========================================================= -->
+            <div id="tabPane_ai" class="space-y-6 hidden">
+                <div class="p-5 sm:p-7 rounded-3xl bg-slate-900/60 border border-slate-800 space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                                <i data-lucide="bot" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-extrabold text-base text-slate-100 font-heading">محرك الذكاء الاصطناعي ومساعد ماكس</h3>
+                                <p class="text-xs text-slate-400">تحكم بالربط السحابي مع Google Gemini 2.5 Flash للدردشة المباشرة ومسح الصور</p>
+                            </div>
+                        </div>
+                        <div id="aiConnectionBadge" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold w-fit">
+                            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                            <span id="aiConnectionText">المستشار المحلي الذكي نشط (بدون توقف) 🟡</span>
+                        </div>
+                    </div>
+
+                    <!-- API Key Input Box -->
+                    <div class="p-4 sm:p-5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label class="block font-bold text-xs text-slate-200">
+                                مفتاح Google Gemini API:
+                            </label>
+                            <span class="text-[11px] text-slate-400 font-mono">يبدأ عادةً بـ AIzaSy...</span>
+                        </div>
+                        <div class="flex flex-col sm:flex-row items-center gap-2.5">
+                            <div class="relative flex-1 w-full">
+                                <input type="password" id="settingGeminiApiKey" placeholder="الصق مفتاحك هنا (مثال: AIzaSy...)"
+                                       class="w-full fintech-input rounded-xl py-2.5 pl-10 pr-3 text-slate-100 text-xs font-mono tracking-wider">
+                                <button type="button" id="btnToggleApiKeyVisibility" onclick="window.toggleApiKeyVisibility()"
+                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 cursor-pointer" title="إظهار / إخفاء المفتاح">
+                                    <i data-lucide="eye" id="eyeApiKeyIcon" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                            <button type="button" id="btnTestApiKey" onclick="window.handleTestApiKey()"
+                                    class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-bold text-emerald-400 hover:text-white transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
+                                <i data-lucide="zap" class="w-3.5 h-3.5"></i>
+                                <span>فحص وتأكيد ⚡</span>
+                            </button>
+                            <button type="button" id="btnSaveApiKey" onclick="window.handleSaveApiKey()"
+                                    class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-xs font-black text-white shadow-md shadow-emerald-500/20 transition flex items-center justify-center gap-1.5 cursor-pointer shrink-0">
+                                <i data-lucide="save" class="w-3.5 h-3.5"></i>
+                                <span>حفظ المفتاح 💾</span>
+                            </button>
+                        </div>
+                        <div id="apiKeyFeedbackMsg" class="hidden p-3 rounded-xl text-xs font-bold flex items-center gap-2"></div>
+                    </div>
+
+                    <!-- Step-by-Step Guide Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <div class="p-5 rounded-2xl bg-slate-950/60 border border-slate-800/80 space-y-3">
+                            <h4 class="font-bold text-slate-200 flex items-center gap-2">
+                                <span class="w-5 h-5 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-mono">1</span>
+                                <span>احصل على مفتاح مجاني دائم (خلال 30 ثانية):</span>
+                            </h4>
+                            <ol class="text-slate-300 space-y-2 list-decimal list-inside pr-1 text-[11px] leading-relaxed">
+                                <li>افتح منصة Google AI Studio من الرابط المباشر أدناه.</li>
+                                <li>سجّل الدخول بحساب Google (جيميل) الخاص بك.</li>
+                                <li>اضغط على زر <strong>"Create API key"</strong> وانسخ الرمز.</li>
+                                <li>الصقه في الحقل أعلاه واضغط <strong>"حفظ المفتاح"</strong>.</li>
+                            </ol>
+                            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer"
+                               class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-bold transition mt-1">
+                                <span>فتح منصة Google AI Studio (مجاناً 100%)</span>
+                                <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                            </a>
+                        </div>
+
+                        <div class="p-5 rounded-2xl bg-slate-950/60 border border-slate-800/80 space-y-3">
+                            <h4 class="font-bold text-slate-200 flex items-center gap-2">
+                                <span class="w-5 h-5 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-[10px] font-mono">2</span>
+                                <span>نظام الحماية الذكي: لا توقف أبداً (Zero Downtime)</span>
+                            </h4>
+                            <ul class="text-slate-300 space-y-2.5 text-[11px]">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-emerald-400">🟢</span>
+                                    <span><strong>مع وجود المفتاح:</strong> ميزة البحث المباشر في Google عن أي جهاز غير مسجل + مسح قوائم الأسعار بالصور بدقة خارقة.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-amber-400">🛡️</span>
+                                    <span><strong>بدون مفتاح (أو عند انقطاع النت):</strong> يعمل الموقع تلقائياً بمستشار ماكس المحلي الذكي؛ يحسب كافة الأقساط، يقترح أجهزة الألعاب والتصوير، ويجيب على الاستفسارات فورياً دون أي رسالة خطأ للزبون نهائياً!</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- TAB 7: 🔒 الأمان ورمز الحماية (Security) -->
             <!-- ========================================================= -->
             <div id="tabPane_security" class="space-y-6 hidden">
                 <div class="p-5 sm:p-7 rounded-3xl bg-slate-900/60 border border-slate-800 space-y-4">
@@ -1094,16 +1257,16 @@
     <!-- Standard Reliable Synchronous Scripts with Cloud Sync Engine -->
     <script src="security.js?v=40"></script>
     <script src="audio.js?v=40"></script>
-    <script src="data.js?v=40"></script>
-    <script src="cloud.js?v=40"></script>
+    <script src="data.js?v=56"></script>
+    <script src="cloud.js?v=56"></script>
     <script src="calculations.js?v=40"></script>
     <script src="state.js?v=40"></script>
     <script src="kiosk.js?v=40"></script>
     <script src="render.js?v=40"></script>
-    <script src="events.js?v=40"></script>
-    <script src="ai-advisor.js?v=47"></script>
-    <script src="scanner.js?v=48"></script>
-    <script src="actions.js?v=48"></script>
-    <script src="pwa.js?v=40"></script>
+    <script src="events.js?v=50"></script>
+    <script src="ai-advisor.js?v=56"></script>
+    <script src="scanner.js?v=56"></script>
+    <script src="actions.js?v=56"></script>
+    <script src="pwa.js?v=56"></script>
 </body>
 </html>

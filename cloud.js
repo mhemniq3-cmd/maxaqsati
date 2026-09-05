@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Global Live Cloud Sync Engine - Max Installment System
  * Powered by Google Firebase Realtime Database
  * Keeps all devices and users worldwide synchronized with live rates & settings
@@ -95,7 +95,8 @@ window.CloudSync = {
                 currency: s.settings.currency || 'IQD',
                 currencySymbol: s.settings.currencySymbol || 'د.ع',
                 calculationMode: s.settings.calculationMode || 'flat',
-                roundingMode: s.settings.roundingMode || 'none'
+                roundingMode: s.settings.roundingMode || 'none',
+                scannerMarkup: Number(s.settings.scannerMarkup !== undefined ? s.settings.scannerMarkup : 15000)
             },
             version: Date.now(),
             updatedAt: new Date().toISOString()

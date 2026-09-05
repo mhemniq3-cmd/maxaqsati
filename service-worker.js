@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'installment-iqd-pwa-v36';
+const CACHE_NAME = 'installment-iqd-pwa-v56';
 
 self.addEventListener('install', (event) => {
     self.skipWaiting();

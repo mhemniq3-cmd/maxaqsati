@@ -18,10 +18,19 @@ window.MaxAIAdvisor = {
     isProcessing: false,
 
     // =====================================================
-    // GEMINI 2.5 FLASH CONFIG (Editable - Admin Only)
+    // GEMINI 2.5 FLASH CONFIG & API KEY MANAGEMENT
     // =====================================================
-    GEMINI_API_KEY: 'AQ.Ab8RN6LH1Lbcq1RZT0I1bGasfpou6k3W-TBM1PrdclHTi3igQQ',
+    GEMINI_API_KEY: '',
     GEMINI_MODEL: 'gemini-2.5-flash',
+
+    getApiKey() {
+        const stored = window.InstallmentData?.Storage?.getApiKey?.();
+        if (stored && stored.trim()) return stored.trim();
+        if (this.GEMINI_API_KEY && this.GEMINI_API_KEY.startsWith('AIzaSy')) {
+            return this.GEMINI_API_KEY.trim();
+        }
+        return '';
+    },
 
     // Device Knowledge Database in IQD
     DEVICE_PRESETS: [
@@ -83,15 +92,46 @@ window.MaxAIAdvisor = {
     // =====================================================
     // Build Gemini System Prompt (Deep Iraqi Dialect & Retail Finance)
     // =====================================================
-    getPresets() {
-        if (window.AppState && Array.isArray(window.AppState.devices) && window.AppState.devices.length > 0) {
-            return window.AppState.devices.map(d => ({
-                keys: d.keys || [d.name.toLowerCase()],
-                name: d.name,
-                price: d.price
-            }));
+    getMarkup() {
+        if (typeof window.getStoreDeviceMarkup === 'function') {
+            return window.getStoreDeviceMarkup();
         }
-        return this.DEVICE_PRESETS;
+        const fromSettings = window.AppState?.settings?.scannerMarkup;
+        if (fromSettings !== undefined && fromSettings !== null && !isNaN(Number(fromSettings))) {
+            return Number(fromSettings);
+        }
+        return 15000;
+    },
+
+    getPresets() {
+        const markup = this.getMarkup();
+
+        const catalogDevices = (window.AppState && Array.isArray(window.AppState.devices) && window.AppState.devices.length > 0)
+            ? window.AppState.devices.map(d => {
+                const raw = (d.rawPrice !== undefined) ? Number(d.rawPrice) : (Number(d.price) || 0);
+                const finalP = d.markupApplied ? Number(d.price) : Math.round(raw + markup);
+                return {
+                    keys: d.keys || [d.name.toLowerCase()],
+                    name: d.name,
+                    rawPrice: raw,
+                    markupApplied: markup,
+                    price: finalP
+                };
+            })
+            : [];
+
+        const basePresets = this.DEVICE_PRESETS.map(d => {
+            const raw = Number(d.price) || 0;
+            return {
+                keys: d.keys,
+                name: d.name,
+                rawPrice: raw,
+                markupApplied: markup,
+                price: Math.round(raw + markup)
+            };
+        });
+
+        return [...catalogDevices, ...basePresets];
     },
 
     buildSystemPrompt() {
@@ -100,10 +140,12 @@ window.MaxAIAdvisor = {
         const storeAddr = s?.settings?.storeAddress || 'بغداد - العراق';
         const storePhone = s?.settings?.storePhone || '07700000000';
         const currentSys = s?.currentSystem === 'manual' ? 'تسديد يدوي مباشر' : 'منصة إلكترونية';
+        const markup = this.getMarkup();
+        const markupFmt = window.FinanceCalculator ? window.FinanceCalculator.formatIraqiShort(markup) : `${markup} د.ع`;
 
-        // Contextual price sheet for quick reference
+        // Contextual price sheet for quick reference (includes markup)
         const presets = this.getPresets();
-        const deviceList = presets.slice(0, 30).map(d =>
+        const deviceList = presets.slice(0, 35).map(d =>
             `- ${d.name}: ${window.FinanceCalculator ? window.FinanceCalculator.formatNumber(d.price) : d.price} د.ع نقداً`
         ).join('\n');
 
@@ -113,6 +155,13 @@ window.MaxAIAdvisor = {
 نظام التقسيط المعتمد حالياً: ${currentSys}
 ساعات العمل: يومياً من 10 صباحاً حتى 10 مساءً
 ملاحظة هامة: لا تذكر إطلاقاً كلمة Gemini أو أي مزود ذكاء خارجي، هويتك هي ماكس (مساعد ماكس الذكي) لمكتب ماكس.
+
+## 💰 سياسة التسعير وهوامش الربح المعتمدة للمكتب (قاعدة ملزمة وحاسمة):
+1. **المبلغ الإضافي المعتمد للمكتب هو (${markupFmt}) وهو مضاف ومدمج بالفعل على جميع أسعار الأجهزة المذكورة في قائمتك الاسترشادية أدناه**.
+2. **عند إعطاء سعر أي جهاز للزبون، اذكر دائماً السعر النهائي المعتمد الذي يتضمن هذا المبلغ الإضافي حصراً**.
+3. **إذا ذكر الزبون أي سعر لجهاز (مثلاً: 535 ألف)، أضف عليه دائماً المبلغ الإضافي المعتمد (${markupFmt}) ليكون سعره الرسمي المعروض للزبون هو (${window.FinanceCalculator ? window.FinanceCalculator.formatIraqiShort(535000 + markup) : '550 ألف'} د.ع نقداً) دائماً وأبداً، واحسب الأقساط عليه حصراً**.
+4. **إذا سأل الزبون عن أي جهاز موجود في قائمتك، التزم بسعر قائمتك الرسمية المعتمدة وتجاهل أي سعر مغاير من نتائج البحث في Google**.
+5. **ممنوع نهائياً ذكر السعر الأصلي الخام بدون الإضافة**، وممنوع ذكر كلمة "مبلغ إضافي" أو "زيادة" أو "نسبة ربح"، فقط اذكر السعر النهائي نقداً والأقساط مباشرة وبكل لباقة.
 
 ## 🇮🇶 إتقان اللهجات والمصطلحات العراقية (قاعدة إلزامية):
 1. **أنت تتحدث باللهجة العراقية الأصيلة فقط** بأسلوب محبب، مهذب، شعبي ومحترف في نفس الوقت:
@@ -140,7 +189,7 @@ window.MaxAIAdvisor = {
 الزبون العادي لا يفهم لغة الأرقام والمصطلحات المعقدة (نوع المعالج وتردد الرام). دائماً جاوبه بالأداء الواقعي بلغتنا العراقية الدارجة:
 1. **ألعاب وببجي (PUBG Mobile & 90fps):**
    - اشرح له بالواقع: "الجهاز يشغل 90 فريم ثابتة وسلسة بدون هبوط، وتبريده ممتاز ما يحمى بجو الصيف حتى لو لعبت ساعات، وبطاريته 5000mAh وشاحنه سريع".
-   - رشح له: **ريلمي 16 برو بلس (realme 16 Pro Plus)** (وحش الألعاب 794 ألف) أو **ريلمي 15T** أو **آيفون 16 برو**.
+   - رشح له: **ريلمي 16 برو بلس (realme 16 Pro Plus)** أو **ريلمي 15T** أو **آيفون 16 برو**.
 2. **تصوير للصالونات، الملابس، والتيك توك والإنستغرام:**
    - اشرح له: "الكاميرا تنطيك ألوان حقيقية وبشرة نقية وعزل سينمائي ناعم للمكياج والمودلز، وتصوير الفيديو ثابت بدون اهتزاز، والإضاءة الليلية واضحة بدون تشويش".
    - رشح له: **آيفون 16 برو / 15 برو**، أو **ريلمي 16 برو بلس** (كاميرا بيريسكوب بورتريه)، أو **سامسونج الترا**.
@@ -152,9 +201,9 @@ window.MaxAIAdvisor = {
    - رشح له: **انفينكس هوت 60 برو بلس**، **هوت 60 برو**، أو **ريلمي 15T**.
 5. **ميزانية وقسط خفيف:**
    - اشرح له: "جهاز ذكي بمواصفات ممتازة وقسطه خفيف جداً ما تحس بيه على الراتب (أقل من 25-35 ألف شهرياً)".
-   - رشح له: **انفينكس سمارت 20 (Infinix Smart 20)** (يبدأ من 185 ألف نقداً).
+   - رشح له: **انفينكس سمارت 20 (Infinix Smart 20)**.
 
-## 💰 قائمة أسعار الأجهزة الاسترشادية:
+## 💰 قائمة أسعار الأجهزة الاسترشادية (شاملة المبلغ الإضافي المعتمد):
 ${deviceList}
 
 ## 📋 المستمسكات والشروط العامة للتقسيط:
@@ -164,7 +213,7 @@ ${deviceList}
 
 ## 🌐 البحث المباشر في Google (ميزة البحث التلقائي):
 عندما يسألك الزبون عن أي جهاز أو موديل غير موجود في قائمتك المحلية (مثل هواتف Honor، Google Pixel، Huawei، OnePlus، أو أسعار صرف الدولار، أو مواعيد نزول أجهزة جديدة):
-1. ابحث في Google فوراً واجلب أحدث سعر ومواصفات موثوقة في السوق العراقي اليوم.
+1. ابحث في Google فوراً واجلب أحدث سعر ومواصفات موثوقة في السوق العراقي اليوم، وأضف عليه دائماً المبلغ الإضافي للمكتب (${markupFmt}).
 2. قدم جواباً مختصراً جداً ومركزاً (سطرين إلى 3 أسطر كحد أقصى) بدون كلام إنشائي، وبالدينار العراقي.
 3. اختم بلباقة عراقية: *"إذا حاب نوفره إلك بالتقسيط في مكتب ماكس، تكدر تراسلنا ع الواتساب وندبره إلك فوراً!"*.
 
@@ -176,8 +225,13 @@ ${deviceList}
     // =====================================================
     // Call Gemini 2.5 Flash API with Live Google Search Grounding
     // =====================================================
-    async callGemini(userMessage) {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.GEMINI_MODEL}:generateContent?key=${this.GEMINI_API_KEY}`;
+    async callGemini(userMessage, ctx) {
+        const apiKey = this.getApiKey();
+        if (!apiKey) {
+            throw new Error('NO_API_KEY');
+        }
+
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
         // Build conversation history for multi-turn memory (last 6 turns max)
         const recentHistory = this.history.slice(-6).map(h => ({
@@ -185,8 +239,15 @@ ${deviceList}
             parts: [{ text: h.text }]
         })).filter(h => h.parts[0].text && h.parts[0].text.length > 1);
 
-        // Add current message
-        recentHistory.push({ role: 'user', parts: [{ text: userMessage }] });
+        // Add current message with retail margin context if available
+        let userTextForGemini = userMessage;
+        if (ctx && ctx.principal) {
+            const markup = this.getMarkup();
+            const markupFmt = window.FinanceCalculator ? window.FinanceCalculator.formatIraqiShort(markup) : `${markup} د.ع`;
+            const priceFmt = window.FinanceCalculator ? window.FinanceCalculator.formatIraqiShort(ctx.principal) : `${ctx.principal.toLocaleString()} د.ع`;
+            userTextForGemini += `\n\n[تعليمات إلزامية للتسعير من إدارة المكتب: السعر الرسمي المعتمد لهذا الجهاز في مكتب ماكس بعد إضافة هامش المكتب (${markupFmt}) هو (${priceFmt} / ${ctx.principal.toLocaleString()} د.ع نقداً). اذكر هذا السعر حصراً (${priceFmt}) كـ سعر نقدي واعتمد عليه في كافة حسبات الأقساط، وممنوع منعاً باتاً ذكر أي سعر خام قديم مثل ${ctx.rawPrice ? ctx.rawPrice.toLocaleString() : ''}].`;
+        }
+        recentHistory.push({ role: 'user', parts: [{ text: userTextForGemini }] });
 
         const body = {
             system_instruction: { parts: [{ text: this.buildSystemPrompt() }] },
@@ -216,7 +277,184 @@ ${deviceList}
         const candidate = data?.candidates?.[0];
         const textParts = candidate?.content?.parts?.map(p => p.text || '').filter(Boolean);
         const replyText = textParts?.join('\n')?.trim();
-        return replyText || 'عذراً، لم أتمكن من الرد الآن. حاول مجدداً!';
+        return replyText || '';
+    },
+
+    // =====================================================
+    // Enforce Store Retail Markup On Model Outputs
+    // Replaces any raw/wholesale prices with the official marked-up prices
+    // =====================================================
+    enforceMarkupOnReply(replyText, ctx) {
+        if (!replyText || typeof replyText !== 'string') return replyText;
+        const markup = this.getMarkup();
+        if (markup <= 0) return replyText;
+
+        // Build a replacement map of raw values to final values
+        // e.g. 535000 -> 550000, 794000 -> 809000, 535 -> 550, 794 -> 809
+        const priceMap = new Map();
+
+        // 1. If financial context has a rawPrice and principal
+        if (ctx && ctx.rawPrice && ctx.principal && ctx.rawPrice !== ctx.principal) {
+            const rawP = Number(ctx.rawPrice);
+            const finalP = Number(ctx.principal);
+            const rawK = Math.round(rawP / 1000);
+            const finalK = Math.round(finalP / 1000);
+            priceMap.set(rawP, finalP);
+            priceMap.set(rawK, finalK);
+        }
+
+        // 2. Presets (only add if not already in map)
+        const presets = this.getPresets();
+        presets.forEach(p => {
+            if (p.rawPrice && p.price && p.rawPrice !== p.price) {
+                const rP = Number(p.rawPrice);
+                const fP = Number(p.price);
+                const rK = Math.round(rP / 1000);
+                const fK = Math.round(fP / 1000);
+                if (!priceMap.has(rP)) priceMap.set(rP, fP);
+                if (!priceMap.has(rK)) priceMap.set(rK, fK);
+            }
+        });
+
+        if (priceMap.size === 0) return replyText;
+
+        let text = replyText;
+
+        // Single pass for thousands notation: e.g. "535 الف" or "794 الف"
+        text = text.replace(/(^|[^0-9])(\d{2,4})\s*(?:الف|ألف|k)(?=[^0-9a-zA-Z]|$)/gi, (match, prefix, numStr) => {
+            const val = Number(numStr);
+            if (priceMap.has(val)) {
+                return `${prefix}${priceMap.get(val)} الف`;
+            }
+            return match;
+        });
+
+        // Single pass for full numbers with or without commas: e.g. "535,000" or "535000" or "535،000"
+        text = text.replace(/(^|[^0-9])(\d{1,3}(?:[,،]\d{3})+|\d{5,8})(?![0-9])/g, (match, prefix, numWithCommas) => {
+            const cleanNum = Number(numWithCommas.replace(/[,،]/g, ''));
+            if (priceMap.has(cleanNum)) {
+                const finalVal = priceMap.get(cleanNum);
+                const formatted = numWithCommas.includes(',') || numWithCommas.includes('،')
+                    ? finalVal.toLocaleString()
+                    : String(finalVal);
+                return `${prefix}${formatted}`;
+            }
+            return match;
+        });
+
+        return text;
+    },
+
+    // =====================================================
+    // Test Gemini API Key Connection
+    // =====================================================
+    async testApiKey(key) {
+        if (!key || !key.trim()) {
+            return { success: false, error: 'يرجى إدخال أو لصق مفتاح API أولاً' };
+        }
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.GEMINI_MODEL}:generateContent?key=${key.trim()}`;
+        const body = {
+            contents: [{ parts: [{ text: 'مرحبا' }] }],
+            generationConfig: { maxOutputTokens: 10 }
+        };
+        try {
+            const resp = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            if (!resp.ok) {
+                const errData = await resp.json().catch(() => ({}));
+                return { success: false, error: errData?.error?.message || `خطأ في المصادقة: HTTP ${resp.status}` };
+            }
+            return { success: true, message: 'تم الاتصال بنجاح مع Google Gemini 2.5 Flash! ⚡' };
+        } catch (e) {
+            return { success: false, error: e.message || 'فشل الاتصال بالإنترنت' };
+        }
+    },
+
+    // =====================================================
+    // Local Intelligent Iraqi Sales Advisor Engine (Zero-Downtime Fallback)
+    // Works 100% offline or when API key is not configured/expired
+    // =====================================================
+    generateLocalSmartReply(userText, ctx) {
+        const norm = (userText || '').toLowerCase().replace(/[٠-٩]/g, d => '0123456789'['٠١٢٣٤٥٦٧٨٩'.indexOf(d)]);
+        const s = window.AppState;
+        const storeName = s?.settings?.storeName || 'مكتب ماكس للتقسيط';
+        const storeAddr = s?.settings?.storeAddress || 'بغداد - العراق';
+        const storePhone = s?.settings?.storePhone || '07700000000';
+        const presets = this.getPresets();
+
+        // 1. Greetings & Pleasantries
+        if (/^(السلام عليكم|سلام عليكم|مرحبا|مرحباً|هلو|هلا|صباح الخير|مساء الخير|شلونك|شلونكم|شخبارك|حياك الله|عساكم بخير)/i.test(norm) && !ctx.identifiedProduct && !ctx.principal) {
+            return `وعليكم السلام ورحمة الله وبركاته، كل الهلا بيك عيوني نورت **${storeName}** 💎\n\nأنا **مساعد ماكس الذكي**، حاضر وممنون لأي استفسار عن أسعار الأجهزة بالدينار العراقي وحساب الأقساط الشهرية.\n\nشنو الجهاز اللي ببالك أو تحب نحسبلك قسطه اليوم؟`;
+        }
+
+        // 2. Installment Terms & Required Documents
+        if (/مستمسكات|شروط|شروطكم|المستمسك|شنو المطلوب|شلون اقسط|كفيل|بدون كفيل|استقطاع|كي كارد|ماستر كارد|ماستركارد|نخيل|رواتب/i.test(norm) && !ctx.identifiedProduct) {
+            return `تدلل عيوني وياهلا بيك! شروط التقسيط في **${storeName}** مبسطة جداً:\n\n` +
+                   `1. **لحاملي بطاقات الماستر كارد / الكي كارد (الموطنة رواتبهم):** التقسيط فوري بدون كفيل عن طريق استقطاع الراتب الرسمي.\n` +
+                   `2. **للكسبة والأعمال الحرة:** البطاقة الوطنية الموحدة + بطاقة السكن + كفيل موظف مدني مستمر بالخدمة.\n\n` +
+                   `تشرفنا بأي وقت أو راسلنا مباشرة على الواتساب (${storePhone}) ونكمل معاملتك فوراً 💬`;
+        }
+
+        // 3. Store Location & Working Hours
+        if (/وين مكانكم|وين موقعكم|وين صايرين|عنوانكم|يا محافظة|ساعات العمل|شوكت تفتحون|وقت الدوام|شوكت تعزلون/i.test(norm)) {
+            return `كل الهلا بيك تاج راسي! تشرفنا بأي وقت:\n\n` +
+                   `📍 **العنوان:** ${storeAddr}\n` +
+                   `⏰ **ساعات الدوام:** يومياً من الساعة 10:00 صباحاً حتى 10:00 مساءً\n` +
+                   `📞 **رقم الواتساب والاستفسارات:** ${storePhone}\n\n` +
+                   `تكدر تشرفنا للمكتب أو تراسلنا واتساب بأي وقت وندبرلك كل اللي تريده!`;
+        }
+
+        // 4. Trade-in / Device Exchange
+        if (/ابدل|تبديل|استبدال|جهاز قديم|تاخذون مستعمل|مستعمل/i.test(norm) && !ctx.identifiedProduct) {
+            return `نعم عيوني نكدر نبدلك جهازك القديم! 🔄📱\n\n` +
+                   `تكدر تشرفنا للمكتب يفحصه الفني وينطيك بيه أعلى وأفضل سعر تقييم بالسوق، ونحسب قيمته كدفعة أولى (واصل) ونقسطلك الباقي بأقساط مريحة جداً.\n\n` +
+                   `شنو موديل جهازك القديم؟ أو تكدر تشرفنا مباشرة للمكتب!`;
+        }
+
+        // 5. Specific Product Quote (Calculated with actionCard context)
+        if (ctx.principal) {
+            const prodTitle = ctx.identifiedProduct ? `جهاز **${ctx.identifiedProduct}**` : 'الجهاز المطلوب';
+            const priceFmt = window.FinanceCalculator ? window.FinanceCalculator.formatIraqiShort(ctx.principal) : ctx.principal;
+            const ratesMap = s.rates?.[s.currentSystem === 'manual' ? 'manual' : 'platform'] || window.InstallmentData?.DEFAULT_RATES?.platform || {};
+            const r12 = ratesMap['12'] ?? 12;
+            const calc12 = window.FinanceCalculator ? window.FinanceCalculator.calculatePlan({
+                principal: ctx.principal,
+                downPayment: ctx.downPayment || 0,
+                downPaymentType: 'fixed',
+                months: 12,
+                ratePercent: r12,
+                calculationMode: s.settings?.calculationMode || 'flat',
+                roundingMode: s.settings?.roundingMode || 'none'
+            }) : null;
+
+            const monthlyFmt = calc12 ? window.FinanceCalculator.formatIraqiShort(calc12.monthlyPayment) : '';
+            const perkText = ctx.lifePerk ? `\n\n✨ **مميزات الأداء:** ${ctx.lifePerk}` : '';
+
+            return `تدلل عيوني وياهلا بيك! ${prodTitle} متوفر عدنا بسعر **${priceFmt}** نقداً.${perkText}\n\n` +
+                   (monthlyFmt ? `تقدر تاخذه بنظام الأقساط المريحة بقسط شهري يبدأ من **${monthlyFmt}** (على خطة 12 شهر).\n\n` : '') +
+                   `سويتلك كرت الحسبة التفصيلي جوه 👇 تكدر تدوس **(تطبيق بالحاسبة ⚡)** لتجربة كل الخطط والأشهر، أو تراسلنا على **الواتساب 💬** لحجز الجهاز فوراً!`;
+        }
+
+        // 6. Budget-based Recommendations
+        const parsedAmt = this.parseArabicAmount(userText);
+        if (parsedAmt && parsedAmt >= 150000 && parsedAmt <= 2500000) {
+            const matching = presets.filter(d => Math.abs(d.price - parsedAmt) <= parsedAmt * 0.35 || d.price <= parsedAmt)
+                                    .sort((a, b) => Math.abs(a.price - parsedAmt) - Math.abs(b.price - parsedAmt))
+                                    .slice(0, 3);
+            if (matching.length > 0) {
+                const listStr = matching.map(m => `• **${m.name}**: ${window.FinanceCalculator ? window.FinanceCalculator.formatIraqiShort(m.price) : m.price} نقداً`).join('\n');
+                return `تدلل عيوني! على حدود ميزانيتك (${window.FinanceCalculator ? window.FinanceCalculator.formatIraqiShort(parsedAmt) : parsedAmt})، أفضل وأقوى الأجهزة اللي أنصحك بيها:\n\n${listStr}\n\n` +
+                       `كلها أجهزة كفوءة وضمان حقيقي، وتقدر تقسط أي جهاز منها بدون ما تحس بالقسط. جهزتلك كرت الحسبة لأبرز جهاز منهم جوه 👇`;
+            }
+        }
+
+        // 7. General Inquiry or Unlisted Device
+        return `يا هلا بيك عيوني نورت **${storeName}** 💎\n\n` +
+               `كل أجهزة الهواتف الذكية (آيفون، سامسونج، ريلمي، انفينكس)، أجهزة التابلت وشاشات العرض متوفرة عدنا نقداً وبالتقسيط المريح.\n\n` +
+               `تكدر تكتبلي اسم أي جهاز تريده أو ميزانيتك ونحسبلك قسطه فوراً، أو تكدر تضغط زر **الواتساب 💬** وندبرلك أي طلب خاص بأفضل سعر بالسوق!`;
     },
 
     // =====================================================
@@ -229,6 +467,8 @@ ${deviceList}
         let principal = null;
         let downPayment = 0;
         let identifiedProduct = null;
+        let rawPrice = null;
+        const markup = this.getMarkup();
 
         // Device detection
         const presets = this.getPresets();
@@ -237,7 +477,28 @@ ${deviceList}
             if (isMatch) {
                 identifiedProduct = preset.name;
                 principal = preset.price;
+                rawPrice = preset.rawPrice || Math.max(0, preset.price - markup);
                 break;
+            }
+        }
+
+        // Fuzzy match on device model numbers if not yet found
+        if (!identifiedProduct) {
+            if (/ايفون 16|iphone 16|١٦/i.test(norm)) {
+                const found = presets.find(p => /iphone 16 pro/i.test(p.name)) || presets.find(p => /iphone 16/i.test(p.name));
+                if (found) { identifiedProduct = found.name; principal = found.price; rawPrice = found.rawPrice || Math.max(0, found.price - markup); }
+            } else if (/ايفون 15|iphone 15|١٥/i.test(norm)) {
+                const found = presets.find(p => /iphone 15 pro/i.test(p.name)) || presets.find(p => /iphone 15/i.test(p.name));
+                if (found) { identifiedProduct = found.name; principal = found.price; rawPrice = found.rawPrice || Math.max(0, found.price - markup); }
+            } else if (/ايفون 14|iphone 14|١٤/i.test(norm)) {
+                const found = presets.find(p => /iphone 14/i.test(p.name));
+                if (found) { identifiedProduct = found.name; principal = found.price; rawPrice = found.rawPrice || Math.max(0, found.price - markup); }
+            } else if (/ايفون 13|iphone 13|١٣/i.test(norm)) {
+                const found = presets.find(p => /iphone 13/i.test(p.name));
+                if (found) { identifiedProduct = found.name; principal = found.price; rawPrice = found.rawPrice || Math.max(0, found.price - markup); }
+            } else if (/ريلمي 16|realme 16/i.test(norm)) {
+                const found = presets.find(p => /realme 16/i.test(p.name));
+                if (found) { identifiedProduct = found.name; principal = found.price; rawPrice = found.rawPrice || Math.max(0, found.price - markup); }
             }
         }
 
@@ -247,7 +508,11 @@ ${deviceList}
             if (/مقدمة|مقدمه|واصل|ادفع/i.test(input)) {
                 downPayment = parsed;
             } else if (!principal) {
-                principal = parsed;
+                rawPrice = parsed;
+                principal = parsed + markup;
+                if (!identifiedProduct) {
+                    identifiedProduct = 'الجهاز المطلوب';
+                }
             }
         }
 
@@ -277,37 +542,43 @@ ${deviceList}
         if (!identifiedProduct) {
             // 1. Gaming & PUBG
             if (/ببجي|pubg|العاب|ألعاب|كيمينك|جيمنج|فريم|فريمات|90 فريم|120 فريم/i.test(norm)) {
-                identifiedProduct = 'realme 16 Pro Plus (12GB | 512GB)';
-                principal = 794000;
+                const found = presets.find(p => /realme 16 pro plus/i.test(p.name));
+                identifiedProduct = found ? found.name : 'realme 16 Pro Plus (12GB | 512GB)';
+                principal = found ? found.price : (794000 + markup);
                 lifePerk = '🎮 أداء 90fps ببجي فائق مع تبريد صيف ممتاز';
             }
             // 2. Photography & Social Media & Salons
             else if (/تصوير|كاميرا|كامره|كاميرة|صالون|مكياج|تيك توك|انستغرام|انستا|سيلفي|محتوى|ريلز|فلوقات/i.test(norm)) {
                 if (/ايفون|آيفون|apple|iphone/i.test(norm)) {
-                    identifiedProduct = 'iPhone 16 Pro';
-                    principal = 1700000;
+                    const found = presets.find(p => /iphone 16 pro/i.test(p.name));
+                    identifiedProduct = found ? found.name : 'iPhone 16 Pro';
+                    principal = found ? found.price : (1700000 + markup);
                 } else {
-                    identifiedProduct = 'realme 16 Pro Plus (12GB | 512GB)';
-                    principal = 794000;
+                    const found = presets.find(p => /realme 16 pro plus/i.test(p.name));
+                    identifiedProduct = found ? found.name : 'realme 16 Pro Plus (12GB | 512GB)';
+                    principal = found ? found.price : (794000 + markup);
                 }
                 lifePerk = '📸 كاميرا سينمائية وعزل ناعم للصالونات والمحتوى';
             }
             // 3. Study, Kids, University, Tablets
             else if (/دراسة|دراسه|جهال|أطفال|اطفال|محاضرات|تابلت|ايباد|آيباد|كلية|جامعة|مسلسلات/i.test(norm)) {
-                identifiedProduct = 'Xiaomi Pad 8 Pro (12GB | 512GB)';
-                principal = 940000;
+                const found = presets.find(p => /xiaomi pad 8 pro/i.test(p.name));
+                identifiedProduct = found ? found.name : 'Xiaomi Pad 8 Pro (12GB | 512GB)';
+                principal = found ? found.price : (940000 + markup);
                 lifePerk = '📚 تابلت شاشة عملاقة للدراسة ومقاوم لصدمات الجهال';
             }
             // 4. Delivery, Taxi, Heavy Duty & Battery
             else if (/تكسي|تاكسي|دليفري|توصيل|سائق|شمس|كرف|شحن سريع/i.test(norm)) {
-                identifiedProduct = 'Infinix HOT 60 Pro Plus (8GB | 256GB)';
-                principal = 310000;
+                const found = presets.find(p => /infinix hot 60 pro plus/i.test(p.name));
+                identifiedProduct = found ? found.name : 'Infinix HOT 60 Pro Plus (8GB | 256GB)';
+                principal = found ? found.price : (310000 + markup);
                 lifePerk = '🔋 بطارية عملاقة وكرف شمس مع شحن فائق';
             }
             // 5. Lowest Installment & Budget
             else if (/ارخص|أرخص|رخيص|اقل قسط|أقل قسط|قسط خفيف|ميزانية محدودة/i.test(norm)) {
-                identifiedProduct = 'Infinix Smart 20 (4GB | 64GB)';
-                principal = 185000;
+                const found = presets.find(p => /infinix smart 20/i.test(p.name));
+                identifiedProduct = found ? found.name : 'Infinix Smart 20 (4GB | 64GB)';
+                principal = found ? found.price : (185000 + markup);
                 lifePerk = '💰 قسط خفيف جداً وأعلى قيمة توفير للميزانية';
             }
         } else {
@@ -322,7 +593,7 @@ ${deviceList}
             }
         }
 
-        return { principal, downPayment, identifiedProduct, salary, lifePerk };
+        return { principal, downPayment, identifiedProduct, salary, lifePerk, rawPrice };
     },
 
     // =====================================================
@@ -594,8 +865,27 @@ ${deviceList}
         this.showTypingIndicator(true);
 
         try {
-            // Call Gemini AI
-            const aiReply = await this.callGemini(userText);
+            // Extract financial context & build card immediately
+            const ctx = this.extractFinancialContext(userText);
+            const actionCard = this.buildFinancialCard(ctx);
+
+            let aiReply = null;
+            const apiKey = this.getApiKey();
+
+            if (apiKey) {
+                try {
+                    aiReply = await this.callGemini(userText, ctx);
+                } catch (apiErr) {
+                    console.warn('Gemini API call failed, falling back to Local Smart Advisor:', apiErr.message);
+                }
+            }
+
+            // Post-process Gemini's reply to enforce store markup, or fallback to smart local advisor
+            if (aiReply && aiReply.trim().length > 0) {
+                aiReply = this.enforceMarkupOnReply(aiReply, ctx);
+            } else {
+                aiReply = this.generateLocalSmartReply(userText, ctx);
+            }
 
             // Save to history for multi-turn memory
             this.history.push({ sender: 'user', text: userText });
@@ -604,18 +894,21 @@ ${deviceList}
             // Keep history lean (last 20 messages max)
             if (this.history.length > 20) this.history = this.history.slice(-20);
 
-            // Detect if a financial card should be shown
-            const ctx = this.extractFinancialContext(userText);
-            const actionCard = this.buildFinancialCard(ctx);
-
             this.showTypingIndicator(false);
             this.appendMessage('assistant', aiReply, actionCard);
             if (window.SoundEngine) window.SoundEngine.playSuccessChime();
 
         } catch (err) {
             this.showTypingIndicator(false);
-            console.error('Gemini API Error:', err);
-            this.appendMessage('assistant', `⚠️ عذراً، واجهت مشكلة مؤقتة في الاتصال بالذكاء الاصطناعي.\n\nحاول مجدداً بعد ثانية أو اتصل بنا مباشرة على الواتساب 💬`);
+            console.error('Advisor Error:', err);
+            try {
+                const ctx = this.extractFinancialContext(userText);
+                const actionCard = this.buildFinancialCard(ctx);
+                const fallbackReply = this.generateLocalSmartReply(userText, ctx);
+                this.appendMessage('assistant', fallbackReply, actionCard);
+            } catch (fallbackErr) {
+                this.appendMessage('assistant', `أهلاً وسهلاً بيك عيوني.. تقدر تتواصل معانا مباشرة على الواتساب 💬 ونخدمك فوراً!`);
+            }
         } finally {
             this.isProcessing = false;
         }

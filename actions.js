@@ -129,7 +129,19 @@ window.handleShareWhatsApp = function(e) {
 };
 
 // Password Protection for Settings with Anti-Brute Force Lock
+window.pendingSettingsTab = 'rates';
+window.openProtectedSettings = function(tabId = 'rates') {
+    window.pendingSettingsTab = tabId;
+    window.promptPasswordForSettings();
+};
+
 window.promptPasswordForSettings = function() {
+    // If settingsModal is already open, do nothing
+    const settingsModal = document.getElementById('settingsModal');
+    if (settingsModal && !settingsModal.classList.contains('hidden')) {
+        return;
+    }
+
     const passModal = document.getElementById('passwordModal');
     const passInput = document.getElementById('passwordInput');
     const err = document.getElementById('passwordErrorMsg');
@@ -207,7 +219,9 @@ window.checkPasswordAndOpen = async function() {
         if (lockoutBanner) lockoutBanner.classList.add('hidden');
         if (window.SoundEngine) window.SoundEngine.playSuccessChime();
         window.closePasswordModal();
-        window.openSettingsModal();
+        const targetTab = window.pendingSettingsTab || 'rates';
+        window.pendingSettingsTab = null;
+        window.openSettingsWithTab(targetTab);
     } else {
         let failState = { locked: false, remainingAttempts: 2 };
         if (window.SecurityEngine && window.SecurityEngine.recordFailedAttempt) {
@@ -245,7 +259,7 @@ window.checkPasswordAndOpen = async function() {
 };
 
 window.switchSettingsTab = function(tabId) {
-    const tabs = ['scanner', 'catalog', 'rates', 'store', 'cloud', 'security'];
+    const tabs = ['scanner', 'catalog', 'rates', 'store', 'cloud', 'ai', 'security'];
     tabs.forEach(t => {
         const btn = document.getElementById(`tabBtn_${t}`);
         const pane = document.getElementById(`tabPane_${t}`);
@@ -268,12 +282,100 @@ window.switchSettingsTab = function(tabId) {
     if (tabId === 'catalog' && typeof window.renderSettingsCatalog === 'function') {
         window.renderSettingsCatalog();
     }
+    if (tabId === 'ai' && typeof window.updateAiConnectionBadge === 'function') {
+        window.updateAiConnectionBadge();
+    }
     if (window.lucide) window.lucide.createIcons();
 };
 
-window.openSettingsWithTab = function(tabId = 'scanner') {
+window.openSettingsWithTab = function(tabId = 'rates') {
     window.openSettingsModal();
     window.switchSettingsTab(tabId);
+};
+
+window.toggleApiKeyVisibility = function() {
+    const input = document.getElementById('settingGeminiApiKey');
+    const icon = document.getElementById('eyeApiKeyIcon');
+    if (!input) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (icon) icon.setAttribute('data-lucide', 'eye-off');
+    } else {
+        input.type = 'password';
+        if (icon) icon.setAttribute('data-lucide', 'eye');
+    }
+    if (window.lucide) window.lucide.createIcons();
+};
+
+window.updateAiConnectionBadge = function() {
+    const key = window.InstallmentData?.Storage?.getApiKey?.() || '';
+    const badge = document.getElementById('aiConnectionBadge');
+    const text = document.getElementById('aiConnectionText');
+    if (!badge) return;
+
+    if (key && key.startsWith('AIzaSy')) {
+        badge.className = 'flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold w-fit';
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span id="aiConnectionText">Google Gemini 2.5 متصل وسحابي 🟢</span>`;
+    } else {
+        badge.className = 'flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold w-fit';
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span><span id="aiConnectionText">المستشار المحلي الذكي نشط (بدون توقف) 🟡</span>`;
+    }
+};
+
+window.handleTestApiKey = async function() {
+    const input = document.getElementById('settingGeminiApiKey');
+    const feedback = document.getElementById('apiKeyFeedbackMsg');
+    const btn = document.getElementById('btnTestApiKey');
+    if (!input || !feedback) return;
+
+    const val = input.value.trim();
+    if (!val) {
+        feedback.className = 'p-3 rounded-xl text-xs font-bold flex items-center gap-2 bg-rose-500/15 text-rose-400 border border-rose-500/30';
+        feedback.innerHTML = '<span>⚠️ يرجى إدخال أو لصق مفتاح API أولاً لتجربته</span>';
+        feedback.classList.remove('hidden');
+        return;
+    }
+
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span>جاري الفحص... ⏳</span>';
+    }
+
+    const res = await window.MaxAIAdvisor.testApiKey(val);
+    if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="zap" class="w-3.5 h-3.5"></i><span>فحص وتأكيد ⚡</span>';
+        if (window.lucide) window.lucide.createIcons();
+    }
+
+    if (res.success) {
+        feedback.className = 'p-3 rounded-xl text-xs font-bold flex items-center gap-2 bg-emerald-500/15 text-emerald-400 border border-emerald-500/30';
+        feedback.innerHTML = `<span>✅ ${res.message}</span>`;
+        feedback.classList.remove('hidden');
+        if (window.SoundEngine) window.SoundEngine.playSuccessChime();
+    } else {
+        feedback.className = 'p-3 rounded-xl text-xs font-bold flex items-center gap-2 bg-rose-500/15 text-rose-400 border border-rose-500/30';
+        feedback.innerHTML = `<span>❌ ${res.error}</span>`;
+        feedback.classList.remove('hidden');
+    }
+};
+
+window.handleSaveApiKey = function() {
+    const input = document.getElementById('settingGeminiApiKey');
+    const feedback = document.getElementById('apiKeyFeedbackMsg');
+    if (!input) return;
+
+    const val = input.value.trim();
+    window.InstallmentData.Storage.saveApiKey(val);
+    window.updateAiConnectionBadge();
+
+    if (feedback) {
+        feedback.className = 'p-3 rounded-xl text-xs font-bold flex items-center gap-2 bg-emerald-500/15 text-emerald-400 border border-emerald-500/30';
+        feedback.innerHTML = `<span>💾 تم حفظ المفتاح بنجاح! الموقع جاهز للعمل.</span>`;
+        feedback.classList.remove('hidden');
+    }
+    if (window.showToast) window.showToast('💾 تم حفظ مفتاح الذكاء الاصطناعي');
+    if (window.SoundEngine) window.SoundEngine.playSuccessChime();
 };
 
 window.renderSettingsCatalog = function() {
@@ -366,6 +468,95 @@ window.addNewDeviceToCatalog = function() {
     if (window.showToast) window.showToast(`✨ تمت إضافة ${name} إلى الكتالوج بنجاح!`);
 };
 
+// ==========================================
+// Device Markup Helpers (المبلغ الإضافي للأجهزة)
+// ==========================================
+window.normalizeMarkupValue = function(val) {
+    let num = Number(val) || 0;
+    if (num < 0) num = 0;
+    // In Iraqi Dinar context, if user enters e.g. 15 (meaning 15,000 dinars)
+    if (num > 0 && num < 250) {
+        num = num * 1000;
+    }
+    return Math.round(num);
+};
+
+window.setScannerMarkupPreset = function(amount) {
+    const input = document.getElementById('settingScannerMarkup');
+    if (input) {
+        input.value = amount;
+    }
+    window.handleScannerMarkupInput(amount);
+};
+
+window.getStoreDeviceMarkup = function() {
+    const input = document.getElementById('settingScannerMarkup');
+    if (input && input.value !== '') {
+        const val = window.normalizeMarkupValue ? window.normalizeMarkupValue(input.value) : Number(input.value);
+        if (!isNaN(val) && val >= 0) return val;
+    }
+    const fromSettings = window.AppState?.settings?.scannerMarkup;
+    if (fromSettings !== undefined && fromSettings !== null && !isNaN(Number(fromSettings))) {
+        return Number(fromSettings);
+    }
+    return 15000;
+};
+
+window.handleScannerMarkupInput = function(val) {
+    const norm = window.normalizeMarkupValue(val);
+
+    // Keep AppState in sync immediately so AI Advisor & Scanner pick it up instantly
+    if (window.AppState && window.AppState.settings) {
+        window.AppState.settings.scannerMarkup = norm;
+    }
+
+    // Update quick preset chips visual active state
+    document.querySelectorAll('.markup-chip').forEach(chip => {
+        const chipVal = Number(chip.getAttribute('data-val'));
+        if (chipVal === norm) {
+            chip.className = 'markup-chip px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 transition cursor-pointer';
+        } else {
+            chip.className = 'markup-chip px-2.5 py-1 rounded-lg text-xs font-bold fintech-card hover:bg-slate-800 text-slate-300 transition cursor-pointer';
+        }
+    });
+
+    // Update catalog tab badge
+    const catalogBadge = document.getElementById('catalogCurrentMarkupBadge');
+    if (catalogBadge) {
+        catalogBadge.textContent = norm > 0 ? `+${norm.toLocaleString()} د.ع` : '0 د.ع';
+    }
+
+    // Live reapply to currently scanned items if any exist
+    if (window.PriceScanner && typeof window.PriceScanner.reapplyMarkup === 'function') {
+        window.PriceScanner.reapplyMarkup(norm);
+    }
+};
+
+window.applyMarkupToCurrentCatalog = function() {
+    const input = document.getElementById('settingScannerMarkup');
+    const markup = window.normalizeMarkupValue(input ? input.value : (window.AppState?.settings?.scannerMarkup ?? 15000));
+    if (markup <= 0) {
+        alert('يرجى تحديد مبلغ إضافي أكبر من صفر أولاً');
+        return;
+    }
+    const devices = window.AppState?.devices || [];
+    if (devices.length === 0) {
+        alert('لا توجد أجهزة في الكتالوج حالياً لتعديلها');
+        return;
+    }
+    if (!confirm(`هل ترغب في زيادة أسعار جميع أجهزة الكتالوج (${devices.length} جهاز) بمقدار (+${markup.toLocaleString()} د.ع)؟`)) {
+        return;
+    }
+    devices.forEach(d => {
+        d.price = Math.round((Number(d.price) || 0) + markup);
+    });
+    window.InstallmentData.Storage.saveDevices(devices);
+    if (window.PriceScanner) window.PriceScanner.renderDeviceDatalist();
+    if (typeof window.renderSettingsCatalog === 'function') window.renderSettingsCatalog();
+    if (window.SoundEngine) window.SoundEngine.playSuccessChime();
+    if (window.showToast) window.showToast(`✅ تم زيادة أسعار كافة أجهزة الكتالوج بمقدار (+${markup.toLocaleString()} د.ع)`);
+};
+
 window.openSettingsModal = function() {
     const s = window.AppState;
     const modal = document.getElementById('settingsModal');
@@ -409,6 +600,25 @@ window.openSettingsModal = function() {
     if (storeAddressEl) storeAddressEl.value = s.settings.storeAddress || '';
     if (newPassEl) newPassEl.value = '';
 
+    // 4. Fill AI API Key
+    const apiKeyEl = document.getElementById('settingGeminiApiKey');
+    if (apiKeyEl) {
+        apiKeyEl.value = window.InstallmentData?.Storage?.getApiKey?.() || '';
+    }
+    const feedbackMsg = document.getElementById('apiKeyFeedbackMsg');
+    if (feedbackMsg) feedbackMsg.classList.add('hidden');
+    if (typeof window.updateAiConnectionBadge === 'function') {
+        window.updateAiConnectionBadge();
+    }
+
+    // 5. Fill Scanner & Device Markup
+    const scannerMarkupEl = document.getElementById('settingScannerMarkup');
+    const currentMarkup = Number(s.settings.scannerMarkup !== undefined ? s.settings.scannerMarkup : 15000);
+    if (scannerMarkupEl) {
+        scannerMarkupEl.value = currentMarkup;
+        window.handleScannerMarkupInput(currentMarkup);
+    }
+
     modal.classList.remove('hidden');
     if (window.lucide) window.lucide.createIcons();
 };
@@ -416,6 +626,9 @@ window.openSettingsModal = function() {
 window.closeSettingsModal = function() {
     const modal = document.getElementById('settingsModal');
     if (modal) modal.classList.add('hidden');
+    if (typeof window.closePasswordModal === 'function') {
+        window.closePasswordModal();
+    }
 };
 
 window.saveSettingsFromModal = function() {
@@ -459,6 +672,21 @@ window.saveSettingsFromModal = function() {
         const newPass = newPassEl.value.trim();
         s.settings.password = newPass;
         s.settings.adminPassword = newPass;
+    }
+
+    // 4. Save AI API Key
+    const apiKeyEl = document.getElementById('settingGeminiApiKey');
+    if (apiKeyEl && window.InstallmentData?.Storage?.saveApiKey) {
+        window.InstallmentData.Storage.saveApiKey(apiKeyEl.value);
+        if (typeof window.updateAiConnectionBadge === 'function') {
+            window.updateAiConnectionBadge();
+        }
+    }
+
+    // 5. Save Scanner & Device Markup
+    const scannerMarkupEl = document.getElementById('settingScannerMarkup');
+    if (scannerMarkupEl) {
+        s.settings.scannerMarkup = window.normalizeMarkupValue(scannerMarkupEl.value);
     }
 
     window.InstallmentData.Storage.saveRates(s.rates);

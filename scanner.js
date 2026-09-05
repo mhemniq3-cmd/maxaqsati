@@ -19,7 +19,14 @@ window.PriceScanner = {
         const exportBtn = document.getElementById('btnExportDevicesJson');
         const productInput = document.getElementById('inputProductName');
 
-        if (openBtn) openBtn.addEventListener('click', () => this.toggleModal(true));
+        if (openBtn) openBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (window.openProtectedSettings) {
+                window.openProtectedSettings('scanner');
+            } else {
+                this.toggleModal(true);
+            }
+        });
         if (closeBtn) closeBtn.addEventListener('click', () => this.toggleModal(false));
         if (cancelBtn) cancelBtn.addEventListener('click', () => this.toggleModal(false));
 
@@ -85,7 +92,9 @@ window.PriceScanner = {
         if (typeof open === 'boolean') {
             this.isOpen = open;
             if (open) {
-                if (window.openSettingsWithTab) {
+                if (window.openProtectedSettings) {
+                    window.openProtectedSettings('scanner');
+                } else if (window.openSettingsWithTab) {
                     window.openSettingsWithTab('scanner');
                 } else if (window.openSettingsModal) {
                     window.openSettingsModal();
@@ -132,7 +141,23 @@ window.PriceScanner = {
         const statusText = document.getElementById('scannerStatusText');
         if (statusText) statusText.textContent = 'جاري تحليل الصورة والأسعار بواسطة Google Gemini Vision AI...';
 
-        const apiKey = window.MaxAIAdvisor?.GEMINI_API_KEY || 'AQ.Ab8RN6LH1Lbcq1RZT0I1bGasfpou6k3W-TBM1PrdclHTi3igQQ';
+        const apiKey = window.InstallmentData?.Storage?.getApiKey?.() || window.MaxAIAdvisor?.getApiKey?.() || '';
+        if (!apiKey) {
+            if (statusText) {
+                statusText.innerHTML = `
+                    <div class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl text-amber-300 space-y-2 text-center">
+                        <p class="font-bold text-xs">⚠️ يتطلب مسح وقراءة الصور بالذكاء الاصطناعي إدخال مفتاح Google Gemini API المجاني.</p>
+                        <button type="button" onclick="window.switchSettingsTab('ai')" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition cursor-pointer shadow-sm">
+                            <span>انقر هنا لإدخال المفتاح في تبويب الذكاء الاصطناعي 🤖</span>
+                        </button>
+                    </div>
+                `;
+            }
+            if (window.showToast) window.showToast('⚠️ يرجى إدخال مفتاح Gemini API لتفعيل مسح الصور');
+            this.isScanning = false;
+            return;
+        }
+
         const model = 'gemini-2.5-flash';
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
@@ -140,7 +165,7 @@ window.PriceScanner = {
 افحص الصورة المرفقة بدقة شديدة واستخرج جميع الأجهزة والأجهزة اللوحية (Pads/Tablets) والهواتف المذكورة مع سعات التخزين والرام وأسعارها بالدينار العراقي (IQD).
 
 قواعد استخراج البيانات:
-1. استخرج السعر نقداً بالدينار العراقي كرقم صحيح فقط (مثال: 794000) بدون كتابة IQD أو د.ع وبدون فواصل.
+1. استخرج السعر نقداً بالدينار العراقي كاملاً كرقم صحيح إنجليزي فقط (مثال: إذا كان السعر في القائمة 535 أو 535 ألف اكتبه 535000، وإذا كان 794 اكتبه 794000) بدون كتابة IQD أو د.ع وبدون فواصل وبأرقام إنجليزية (0-9).
 2. اكتب اسم الجهاز كاملاً مع الشركة والذاكرة والرام (مثال: "realme 16 Pro Plus (12GB | 512GB)").
 3. حدد الفئة (هواتف ذكية أو أجهزة لوحية (تابلت) أو إلكترونيات).
 4. أرجع النتيجة حصراً بصيغة مصفوفة JSON نقية صالحة تماماً، بدون أي نصوص أو شروحات قبلها أو بعدها، وبدون وسم الماركداون:
@@ -178,7 +203,11 @@ window.PriceScanner = {
 
             if (!resp.ok) {
                 const err = await resp.json().catch(() => ({}));
-                throw new Error(err?.error?.message || `HTTP ${resp.status}`);
+                const msg = err?.error?.message || `HTTP ${resp.status}`;
+                if (resp.status === 401 || resp.status === 403 || /unauthorized|credentials/i.test(msg)) {
+                    throw new Error('مفتاح Gemini API غير صالح أو منتهي الصلاحية. يرجى تحديثه في تبويب (الذكاء الاصطناعي)');
+                }
+                throw new Error(msg);
             }
 
             const data = await resp.json();
@@ -187,44 +216,99 @@ window.PriceScanner = {
 
             const parsedItems = JSON.parse(cleanedJson);
             if (Array.isArray(parsedItems) && parsedItems.length > 0) {
-                this.scannedItems = parsedItems.map(item => ({
-                    id: (item.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || ('dev-' + Date.now()),
-                    name: item.name || 'جهاز إلكتروني',
-                    brand: item.brand || 'عام',
-                    specs: item.specs || '',
-                    price: Math.round(Number(item.price) || 0),
-                    category: item.category || 'هواتف ذكية',
-                    keys: [item.name.toLowerCase(), (item.brand || '').toLowerCase()]
-                }));
+                const currentMarkup = (typeof window.getStoreDeviceMarkup === 'function')
+                    ? window.getStoreDeviceMarkup()
+                    : 15000;
+
+                this.scannedItems = parsedItems.map(item => {
+                    let str = String(item.price || '').trim();
+                    str = str.replace(/[٠-٩]/g, d => '0123456789'['٠١٢٣٤٥٦٧٨٩'.indexOf(d)]);
+                    const isThousandsWord = /(?:الف|ألف|k)/i.test(str);
+                    const cleanedStr = str.replace(/[,،\s\D]/g, '');
+                    let rawPrice = Math.round(Number(cleanedStr) || 0);
+                    if (isThousandsWord && rawPrice < 10000) {
+                        rawPrice = rawPrice * 1000;
+                    } else if (rawPrice > 0 && rawPrice < 2000) {
+                        // Handle Iraqi price lists where prices are given in thousands (e.g. 535 -> 535000)
+                        rawPrice = rawPrice * 1000;
+                    }
+                    const finalPrice = Math.round(rawPrice + currentMarkup);
+
+                    return {
+                        id: (item.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || ('dev-' + Date.now()),
+                        name: item.name || 'جهاز إلكتروني',
+                        brand: item.brand || 'عام',
+                        specs: item.specs || '',
+                        rawPrice: rawPrice,
+                        markupApplied: currentMarkup,
+                        price: finalPrice,
+                        category: item.category || 'هواتف ذكية',
+                        keys: [item.name.toLowerCase(), (item.brand || '').toLowerCase()]
+                    };
+                });
 
                 this.renderScannedResults();
                 if (window.SoundEngine) window.SoundEngine.playSuccessChime();
-                if (window.showToast) window.showToast(`🎉 تم استخراج ${this.scannedItems.length} جهاز بنجاح!`);
+                if (window.showToast) window.showToast(`🎉 تم استخراج ${this.scannedItems.length} جهاز بنجاح مع إضافة (+${currentMarkup.toLocaleString()} د.ع)!`);
             } else {
                 throw new Error('لم يتم العثور على أجهزة واضحة في الصورة');
             }
         } catch (err) {
             console.error('Price Scanner Error:', err);
             if (statusText) statusText.textContent = `❌ تعذر الاستخراج: ${err.message || 'يرجى التأكد من وضوح الصورة'}`;
-            if (window.showToast) window.showToast('⚠️ لم نتمكن من قراءة الصورة، حاول بصورة أكثر وضوحاً');
+            if (window.showToast) window.showToast('⚠️ تعذر مسح الصورة، تحقق من المفتاح وصلاحية الصورة');
         } finally {
             this.isScanning = false;
         }
+    },
+
+    reapplyMarkup(newMarkup) {
+        if (!this.scannedItems || !this.scannedItems.length) return;
+        const markup = Math.max(0, Number(newMarkup) || 0);
+        this.scannedItems.forEach(item => {
+            const raw = (item.rawPrice !== undefined) ? item.rawPrice : item.price;
+            item.rawPrice = raw;
+            item.markupApplied = markup;
+            item.price = Math.round(raw + markup);
+        });
+        this.renderScannedResults();
     },
 
     renderScannedResults() {
         const resultsContainer = document.getElementById('scannerResultsContainer');
         const tableBody = document.getElementById('scannerDevicesTableBody');
         const badge = document.getElementById('scannerDeviceCountBadge');
+        const markupBadge = document.getElementById('scannerMarkupAppliedBadge');
         const applyBtn = document.getElementById('btnApplyScannedDevices');
 
         if (!resultsContainer || !tableBody) return;
         resultsContainer.classList.remove('hidden');
 
         if (badge) badge.textContent = `${this.scannedItems.length} أجهزة`;
+
+        const firstItemMarkup = this.scannedItems[0]?.markupApplied ?? 0;
+        if (markupBadge) {
+            if (firstItemMarkup > 0) {
+                markupBadge.textContent = `+${firstItemMarkup.toLocaleString()} د.ع مضافة`;
+            } else {
+                markupBadge.textContent = 'بدون إضافة (0)';
+            }
+        }
+
         if (applyBtn) applyBtn.disabled = this.scannedItems.length === 0;
 
-        tableBody.innerHTML = this.scannedItems.map((item, index) => `
+        tableBody.innerHTML = this.scannedItems.map((item, index) => {
+            const hasMarkup = (item.markupApplied && item.markupApplied > 0 && item.rawPrice);
+            const breakdownHtml = hasMarkup 
+                ? `<div class="text-[10px] text-amber-400 font-sans mt-0.5 flex items-center justify-end gap-1">
+                     <span class="text-slate-400">الأصل:</span>
+                     <span class="font-mono">${item.rawPrice.toLocaleString()}</span>
+                     <span>+</span>
+                     <span class="text-emerald-400 font-mono">${item.markupApplied.toLocaleString()}</span>
+                   </div>`
+                : '';
+
+            return `
             <tr class="hover:bg-slate-800/40 transition">
                 <td class="p-3 font-bold text-slate-100 flex items-center gap-2">
                     <span class="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-[10px] font-mono shrink-0">
@@ -240,20 +324,23 @@ window.PriceScanner = {
                            class="bg-transparent border-b border-slate-700/60 focus:border-amber-400 py-1 text-xs w-28 text-slate-300 focus:outline-none">
                 </td>
                 <td class="p-3 font-bold font-mono text-emerald-400">
-                    <div class="relative w-32">
+                    <div class="relative w-36">
                         <input type="number" step="1000" value="${item.price}"
                                onchange="window.PriceScanner.updateItemField(${index}, 'price', this.value)"
-                               class="fintech-input rounded-xl py-1 px-2 text-right font-black text-xs text-emerald-400 w-full focus:outline-none">
+                               class="fintech-input rounded-xl py-1 px-2.5 text-right font-black text-xs text-emerald-400 w-full focus:outline-none focus:border-emerald-400">
+                        <span class="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] text-slate-400">د.ع</span>
                     </div>
+                    ${breakdownHtml}
                 </td>
                 <td class="p-3 text-center">
                     <button type="button" onclick="window.PriceScanner.removeItem(${index})"
-                            class="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition" title="حذف هذا الجهاز">
+                            class="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition cursor-pointer" title="حذف هذا الجهاز">
                         <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                     </button>
                 </td>
             </tr>
-        `).join('');
+            `;
+        }).join('');
 
         if (window.lucide) window.lucide.createIcons();
     },
@@ -261,7 +348,10 @@ window.PriceScanner = {
     updateItemField(index, field, value) {
         if (this.scannedItems[index]) {
             if (field === 'price') {
-                this.scannedItems[index].price = Math.max(0, Number(value) || 0);
+                const newPrice = Math.max(0, Number(value) || 0);
+                this.scannedItems[index].price = newPrice;
+                const applied = this.scannedItems[index].markupApplied || 0;
+                this.scannedItems[index].rawPrice = Math.max(0, newPrice - applied);
             } else {
                 this.scannedItems[index][field] = value;
             }

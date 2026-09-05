@@ -1,4 +1,4 @@
-﻿/**
+/**
  * PWA (Progressive Web App) & Cache Management
  */
 
@@ -7,7 +7,7 @@ let deferredInstallPrompt = null;
 // Register Service Worker with active cache-busting
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js?v=36')
+        navigator.serviceWorker.register('./service-worker.js?v=56')
             .then((registration) => {
                 console.log('[PWA] Service Worker registered:', registration.scope);
                 // Force check for updates on every page load

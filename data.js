@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Installment Calculation System - Data & Defaults
  * Currency: IQD (الدينار العراقي)
  * Rates: Platform (5 Plans), Manual (5 Plans), and Other Banking Services
@@ -40,7 +40,8 @@ window.InstallmentData = {
         roundingMode: 'none', // 'none' | '1000' | '5000'
         theme: 'light', // Default to Light Mode
         password: '1234',
-        adminPassword: '1234'
+        adminPassword: '1234',
+        scannerMarkup: 15000 // المبلغ الإضافي المضاف للأجهزة المستخرجة (د.ع)
     },
 
     DEFAULT_DEVICES: [
@@ -382,7 +383,28 @@ window.InstallmentData = {
             RATES: 'installment_app_rates_iqd_v2',
             SETTINGS: 'installment_app_settings_iqd_v2',
             TRACKING: 'installment_app_tracking_iqd_v2',
-            DEVICES: 'installment_app_devices_iqd_v2'
+            DEVICES: 'installment_app_devices_iqd_v2',
+            API_KEY: 'max_gemini_api_key'
+        },
+
+        getApiKey() {
+            try {
+                return localStorage.getItem(this.KEYS.API_KEY) || '';
+            } catch(e) {
+                return '';
+            }
+        },
+
+        saveApiKey(key) {
+            try {
+                if (key && key.trim()) {
+                    localStorage.setItem(this.KEYS.API_KEY, key.trim());
+                } else {
+                    localStorage.removeItem(this.KEYS.API_KEY);
+                }
+            } catch(e) {
+                console.error('Failed to save API key', e);
+            }
         },
 
         getRates() {
@@ -426,7 +448,8 @@ window.InstallmentData = {
                         ...parsed,
                         theme: parsed.theme || 'light',
                         password: parsed.password || parsed.adminPassword || '1234',
-                        adminPassword: parsed.password || parsed.adminPassword || '1234'
+                        adminPassword: parsed.password || parsed.adminPassword || '1234',
+                        scannerMarkup: parsed.scannerMarkup !== undefined ? Number(parsed.scannerMarkup) : window.InstallmentData.DEFAULT_SETTINGS.scannerMarkup
                     };
                 }
             } catch (e) {
@@ -486,4 +509,17 @@ window.InstallmentData = {
             return defaults;
         }
     }
+};
+
+window.getStoreDeviceMarkup = function() {
+    const input = (typeof document !== 'undefined') ? document.getElementById('settingScannerMarkup') : null;
+    if (input && input.value !== '') {
+        const num = Number(input.value);
+        if (!isNaN(num) && num >= 0) return (num > 0 && num < 250) ? num * 1000 : Math.round(num);
+    }
+    const fromSettings = window.AppState?.settings?.scannerMarkup;
+    if (fromSettings !== undefined && fromSettings !== null && !isNaN(Number(fromSettings))) {
+        return Number(fromSettings);
+    }
+    return 15000;
 };

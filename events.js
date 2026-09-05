@@ -360,9 +360,10 @@ window.setupEventListeners = function() {
 
     // Protected Settings Trigger
     if (els.openSettingsBtn) {
-        els.openSettingsBtn.addEventListener('click', () => {
+        els.openSettingsBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             if (window.SoundEngine) window.SoundEngine.playTick();
-            window.promptPasswordForSettings();
+            window.openProtectedSettings('rates');
         });
     }
     
